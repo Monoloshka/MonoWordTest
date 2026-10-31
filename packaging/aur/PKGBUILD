@@ -1,0 +1,19 @@
+# Maintainer: YOUR-NAME <you@example.com>
+# Template for the AUR. Repackages the Linux x64 tar.gz built by GitHub Actions. Not tested.
+pkgname=monowordtest-bin
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="Translation guessing game (word - translation lines)"
+arch=('x86_64')
+url="https://github.com/YOUR-NAME/MonoWordTest"
+license=('MIT')
+depends=('gtk3' 'nss' 'alsa-lib')
+source=("$url/releases/download/v$pkgver/MonoWordTest-$pkgver-linux-x64.tar.gz")
+sha256sums=('SKIP')   # replace with the real checksum before publishing
+options=('!strip')
+
+package() {
+  install -d "$pkgdir/opt/monowordtest" "$pkgdir/usr/bin"
+  cp -r "$srcdir/MonoWordTest-$pkgver"/. "$pkgdir/opt/monowordtest/"
+  ln -s /opt/monowordtest/monowordtest "$pkgdir/usr/bin/monowordtest"
+}
