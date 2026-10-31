@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MonoWordTest</title>
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; }
+  body { font-family: Arial, Helvetica, sans-serif; background: #f4f3ee; color: #141413; }
+  #app { display: -webkit-flex; display: flex; -webkit-flex-direction: column; flex-direction: column; min-height: 100%; box-sizing: border-box; padding: 12px; }
+  .hidden { display: none !important; }
+  .screen { -webkit-flex: 1; flex: 1; display: -webkit-flex; display: flex; -webkit-flex-direction: column; flex-direction: column; min-height: 0; }
+
+  /* menu */
+  #menu { -webkit-align-items: center; align-items: center; -webkit-justify-content: center; justify-content: center; text-align: center; }
+  h1 { margin: 0 0 6px; font-size: 34px; color: #d97757; }
+  .sub { margin: 0 0 22px; color: #6b6a63; }
+  .row { margin: 8px 0; }
+  .btn, button { font: inherit; cursor: pointer; border: 1px solid #c9c6b8; background: #fff; color: #141413; padding: 10px 18px; border-radius: 6px; }
+  .btn:hover, button:hover { background: #f0eee6; }
+  .primary { background: #d97757; border-color: #c4623f; color: #fff; }
+  .primary:hover { background: #c4623f; }
+  .primary[disabled] { background: #e7c3b4; border-color: #e7c3b4; cursor: default; }
+  #file { position: absolute; left: -9999px; }
+  label { margin-right: 6px; }
+  select { font: inherit; padding: 6px; }
+  #fileName, #message { color: #6b6a63; font-size: 14px; word-wrap: break-word; }
+  #message.error { color: #b3261e; }
+
+  /* game */
+  #board { -webkit-flex: 1; flex: 1; display: -webkit-flex; display: flex; -webkit-flex-direction: row; flex-direction: row; min-height: 0; }
+  #questionBox { -webkit-flex: 1; flex: 1; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; -webkit-justify-content: center; justify-content: center; padding: 16px; }
+  #question { font-size: 40px; font-weight: bold; text-align: center; word-wrap: break-word; max-width: 100%; }
+  #answers { -webkit-flex: 1; flex: 1; display: -webkit-flex; display: flex; -webkit-flex-direction: column; flex-direction: column; -webkit-justify-content: center; justify-content: center; overflow-y: auto; padding: 8px; }
+  .ans { display: block; width: 100%; margin: 4px 0; padding: 12px 14px; font-size: 20px; text-align: left; word-wrap: break-word; min-height: 48px; }
+  .ans.wrong { background: #d9534f; border-color: #b52b27; color: #fff; }
+  .ans.right { background: #3c9d4a; border-color: #2b7a37; color: #fff; }
+  #statusbar { display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; -webkit-justify-content: space-between; justify-content: space-between; padding: 8px 4px; }
+  #status { color: #6b6a63; }
+
+  /* phones / portrait: question on top, answers below */
+  @media (max-width: 700px), (orientation: portrait) {
+    #board { -webkit-flex-direction: column; flex-direction: column; }
+    #question { font-size: 30px; }
+    .ans { font-size: 18px; }
+  }
+
+  footer { text-align: center; padding-top: 8px; line-height: 0; }
+  footer a { display: inline-block; }
+  footer svg { border: 0; }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div id="menu" class="screen">
+    <h1>MonoWordTest</h1>
+    <p class="sub">Guess the translation. Load a .txt file with lines like <b>word - translation</b>.</p>
+
+    <div class="row">
+      <label class="btn" for="file">Browse&hellip;</label>
+      <input type="file" id="file" accept=".txt,text/plain">
+      <button type="button" id="builtinBtn">Use built-in RU &#8596; EN dictionary</button>
+    </div>
+    <div class="row" id="fileName">No file selected</div>
+
+    <div class="row">
+      <label for="count">Answer options:</label>
+      <select id="count">
+        <option>2</option><option>3</option><option selected>4</option><option>5</option>
+        <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option>
+      </select>
+    </div>
+    <div class="row">
+      <label for="dir">Show:</label>
+      <select id="dir">
+        <option value="rand" selected>Random side</option>
+        <option value="ab">Left of " - " (guess the right)</option>
+        <option value="ba">Right of " - " (guess the left)</option>
+      </select>
+    </div>
+    <div class="row"><button type="button" id="startBtn" class="primary" disabled>Start</button></div>
+    <div class="row" id="message"></div>
+  </div>
+
+  <div id="game" class="screen hidden">
+    <div id="board">
+      <div id="questionBox"><div id="question"></div></div>
+      <div id="answers"></div>
+    </div>
+    <div id="statusbar">
+      <span id="status"></span>
+      <button type="button" id="closeBtn">Close</button>
+    </div>
+  </div>
+
+  <footer>
+    <a href="https://claude.ai/" target="_blank" rel="noopener noreferrer" title="Claude">
+      <svg xmlns="http://www.w3.org/2000/svg" width="88" height="31" viewBox="0 0 88 31" role="img" aria-label="Claude">
+        <rect x="0.5" y="0.5" width="87" height="30" rx="3" fill="#faf9f5" stroke="#d6d3c8"/>
+        <g stroke="#d97757" stroke-width="2.4" stroke-linecap="round">
+          <line x1="16.0" y1="12.3" x2="16.0" y2="4.5"/>
+          <line x1="17.6" y1="12.7" x2="20.0" y2="8.6"/>
+          <line x1="18.8" y1="13.9" x2="25.1" y2="10.2"/>
+          <line x1="19.2" y1="15.5" x2="23.5" y2="15.5"/>
+          <line x1="18.8" y1="17.1" x2="25.5" y2="21.0"/>
+          <line x1="17.6" y1="18.3" x2="20.2" y2="22.9"/>
+          <line x1="16.0" y1="18.7" x2="16.0" y2="25.5"/>
+          <line x1="14.4" y1="18.3" x2="12.3" y2="22.0"/>
+          <line x1="13.2" y1="17.1" x2="6.5" y2="21.0"/>
+          <line x1="12.8" y1="15.5" x2="8.0" y2="15.5"/>
+          <line x1="13.2" y1="13.9" x2="6.9" y2="10.2"/>
+          <line x1="14.4" y1="12.7" x2="12.0" y2="8.6"/>
+        </g>
+        <text x="33" y="21" font-family="Georgia,'Times New Roman',serif" font-size="16" fill="#141413" textLength="50" lengthAdjust="spacingAndGlyphs">Claude</text>
+      </svg>
+    </a>
+  </footer>
+</div>
+
+<!-- Built-in dictionary (defines BUILTIN_DICTIONARY). Optional: the app works without it. -->
+<script src="dictionary.js" charset="utf-8"></script>
+<script>
+/* MonoWordTest - plain ES5, no dependencies, so it runs on old and new engines alike. */
+(function () {
+  'use strict';
+
+  var SEPARATOR = ' - ';      // space-hyphen-space; a bare "-" inside a word is NOT a separator
+  var ROUND_DELAY = 5;        // seconds between rounds
+  var MAX_PAIRS = 500000;     // safety cap for huge files
+
+  var pairs = [];             // [{a: 'left', b: 'right'}, ...]
+  var locked = false;
+  var tickTimer = null;
+  var round = null;
+
+  function $(id) { return document.getElementById(id); }
+  function setText(el, t) { if ('textContent' in el) { el.textContent = t; } else { el.innerText = t; } }
+  function on(el, ev, fn) { if (el.addEventListener) { el.addEventListener(ev, fn, false); } else if (el.attachEvent) { el.attachEvent('on' + ev, fn); } }
+  function addClass(el, c) { if ((' ' + el.className + ' ').indexOf(' ' + c + ' ') < 0) { el.className += (el.className ? ' ' : '') + c; } }
+  function delClass(el, c) { el.className = (' ' + el.className + ' ').replace(' ' + c + ' ', ' ').replace(/^\s+|\s+$/g, ''); }
+  function randInt(n) { return Math.floor(Math.random() * n); }
+  function trim(s) { return s.replace(/^\s+|\s+$/g, ''); }
+
+  function showMessage(text, isError) {
+    var m = $('message');
+    setText(m, text || '');
+    m.className = isError ? 'error' : '';
+  }
+
+  /* ---------- parsing: never throws, silently skips bad lines ---------- */
+  function parseText(text) {
+    var out = [];
+    try {
+      text = String(text).replace(/^\uFEFF/, '');
+      var lines = text.split(/\r\n|\r|\n/);
+      for (var i = 0; i < lines.length && out.length < MAX_PAIRS; i++) {
+        var line = lines[i];
+        var p = line.indexOf(SEPARATOR);
+        if (p < 0) { continue; }
+        var a = trim(line.substring(0, p));
+        var b = trim(line.substring(p + SEPARATOR.length));
+        if (a === '' || b === '') { continue; }
+        out.push({ a: a, b: b });
+      }
+    } catch (e) { /* ignore: whatever was parsed so far is kept */ }
+    return out;
+  }
+
+  function loadDictionary(text, label) {
+    var parsed = parseText(text);
+    if (parsed.length < 2) {
+      pairs = [];
+      $('startBtn').disabled = true;
+      setText($('fileName'), label);
+      showMessage('No usable lines found. Each line must look like: word - translation (at least 2 lines).', true);
+      return;
+    }
+    pairs = parsed;
+    $('startBtn').disabled = false;
+    setText($('fileName'), label);
+    showMessage('Loaded ' + pairs.length + ' entries. Choose options and press Start.', false);
+  }
+
+  /* ---------- file reading (UTF-8, falls back to Windows-1251) ---------- */
+  function readFile(file) {
+    if (typeof FileReader === 'undefined') {
+      showMessage('This browser cannot read files. Use the built-in dictionary.', true);
+      return;
+    }
+    var r = new FileReader();
+    r.onerror = function () { showMessage('Could not read the file.', true); };
+    r.onload = function () {
+      var txt = r.result;
+      if (typeof txt === 'string' && txt.indexOf('\uFFFD') >= 0) {
+        var r2 = new FileReader();
+        r2.onerror = function () { loadDictionary(txt, file.name); };
+        r2.onload = function () { loadDictionary(r2.result, file.name + ' (Windows-1251)'); };
+        try { r2.readAsText(file, 'windows-1251'); } catch (e) { loadDictionary(txt, file.name); }
+      } else {
+        loadDictionary(txt, file.name);
+      }
+    };
+    try { r.readAsText(file, 'UTF-8'); } catch (e) { showMessage('Could not read the file.', true); }
+  }
+
+  /* ---------- game ---------- */
+  function shuffle(arr) {
+    for (var i = arr.length - 1; i > 0; i--) {
+      var j = randInt(i + 1), t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+    }
+    return arr;
+  }
+
+  function stopTimer() { if (tickTimer) { clearInterval(tickTimer); tickTimer = null; } }
+
+  function newRound() {
+    stopTimer();
+    locked = false;
+    var wanted = parseInt($('count').value, 10) || 4;
+    var dir = $('dir').value;
+    var idx = randInt(pairs.length);
+    var flip = (dir === 'ba') ? true : (dir === 'ab') ? false : (Math.random() < 0.5);
+    var prompt = flip ? pairs[idx].b : pairs[idx].a;
+    var correct = flip ? pairs[idx].a : pairs[idx].b;
+
+    var options = [correct];
+    var used = {}; used['$' + correct.toLowerCase()] = true;
+    var tries = 0, maxTries = wanted * 60;
+    while (options.length < wanted && tries < maxTries) {
+      tries++;
+      var k = randInt(pairs.length);
+      var q = flip ? pairs[k].b : pairs[k].a;
+      var c = flip ? pairs[k].a : pairs[k].b;
+      var key = '$' + c.toLowerCase();
+      if (used[key] || q === prompt) { continue; }   // no duplicates, no second "correct" answer
+      used[key] = true;
+      options.push(c);
+    }
+    shuffle(options);
+    round = { correct: correct };
+
+    setText($('question'), prompt);
+    var box = $('answers');
+    box.innerHTML = '';
+    for (var i = 0; i < options.length; i++) {
+      box.appendChild(makeButton(options[i]));
+    }
+    setText($('status'), 'Pick the translation.');
+  }
+
+  function makeButton(text) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'ans';
+    setText(b, text);
+    on(b, 'click', function () {
+      if (locked || b.className.indexOf('wrong') >= 0) { return; }
+      if (text === round.correct) {
+        addClass(b, 'right');
+        locked = true;
+        startCountdown();
+      } else {
+        addClass(b, 'wrong');
+      }
+    });
+    return b;
+  }
+
+  function startCountdown() {
+    var left = ROUND_DELAY;
+    setText($('status'), 'Correct! Next word in ' + left + '...');
+    tickTimer = setInterval(function () {
+      left--;
+      if (left <= 0) { newRound(); }
+      else { setText($('status'), 'Correct! Next word in ' + left + '...'); }
+    }, 1000);
+  }
+
+  function showGame() {
+    addClass($('menu'), 'hidden');
+    delClass($('game'), 'hidden');
+    newRound();
+  }
+
+  function showMenu() {
+    stopTimer();
+    locked = false;
+    addClass($('game'), 'hidden');
+    delClass($('menu'), 'hidden');
+  }
+
+  function closeApp() {
+    stopTimer();
+    try { window.close(); } catch (e) { /* not allowed in a plain browser tab */ }
+    showMenu();   // if the window did not close, go back to the start screen
+  }
+
+  /* ---------- wiring ---------- */
+  on($('file'), 'change', function () {
+    var f = $('file').files && $('file').files[0];
+    if (f) { readFile(f); }
+  });
+  on($('builtinBtn'), 'click', function () {
+    if (typeof BUILTIN_DICTIONARY === 'string') {
+      loadDictionary(BUILTIN_DICTIONARY, 'Built-in RU \u2194 EN dictionary');
+    } else {
+      showMessage('Built-in dictionary (dictionary.js) was not found next to this page.', true);
+    }
+  });
+  on($('startBtn'), 'click', function () { if (pairs.length > 1) { showGame(); } });
+  on($('closeBtn'), 'click', closeApp);
+})();
+</script>
+</body>
+</html>
