@@ -1,0 +1,45 @@
+{
+  "name": "monowordtest",
+  "productName": "MonoWordTest",
+  "version": "1.0.0",
+  "description": "Translation guessing game: load word - translation lines and pick the right answer.",
+  "author": { "name": "YOUR-NAME", "email": "you@example.com" },
+  "homepage": "https://github.com/YOUR-NAME/MonoWordTest",
+  "license": "MIT",
+  "main": "desktop/main.js",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --publish never"
+  },
+  "devDependencies": {
+    "electron": "^33.2.1",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "io.github.monowordtest",
+    "productName": "MonoWordTest",
+    "artifactName": "MonoWordTest-${version}-${os}-${arch}.${ext}",
+    "directories": { "output": "dist", "buildResources": "build" },
+    "files": [
+      "index.html", "translations.js", "ads.js", "dictionary.js",
+      "desktop/main.js", "build/icon.png"
+    ],
+    "compression": "maximum",
+    "win": { "icon": "build/icon.png", "target": ["portable"] },
+    "portable": { "artifactName": "MonoWordTest-${version}-win10-11-${arch}-portable.${ext}" },
+    "msi": { "artifactName": "MonoWordTest-${version}-win-${arch}.${ext}", "oneClick": false },
+    "mac": { "icon": "build/icon.png", "category": "public.app-category.education", "identity": null },
+    "linux": {
+      "icon": "build/icon.png",
+      "category": "Education",
+      "synopsis": "Translation guessing game",
+      "maintainer": "YOUR-NAME <you@example.com>"
+    },
+    "flatpak": {
+      "runtime": "org.freedesktop.Platform", "runtimeVersion": "24.08",
+      "sdk": "org.freedesktop.Sdk",
+      "base": "org.electronjs.Electron2.BaseApp", "baseVersion": "24.08"
+    }
+  }
+}

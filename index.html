@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
 <title>MonoWordTest</title>
 <style>
   html, body { margin: 0; padding: 0; height: 100%; }
@@ -12,19 +13,24 @@
   .hidden { display: none !important; }
   .screen { -webkit-flex: 1; flex: 1; display: -webkit-flex; display: flex; -webkit-flex-direction: column; flex-direction: column; min-height: 0; }
 
+  /* top bar: language + theme */
+  #topbar { display: -webkit-flex; display: flex; -webkit-flex-wrap: wrap; flex-wrap: wrap; -webkit-justify-content: flex-end; justify-content: flex-end; font-size: 14px; }
+  #topbar div { margin: 0 0 6px 14px; }
+  #topbar select { padding: 4px; }
+
   /* menu */
   #menu { -webkit-align-items: center; align-items: center; -webkit-justify-content: center; justify-content: center; text-align: center; }
   h1 { margin: 0 0 6px; font-size: 34px; color: #d97757; }
-  .sub { margin: 0 0 22px; color: #6b6a63; }
+  .sub { margin: 0 0 22px; color: #6b6a63; max-width: 560px; }
   .row { margin: 8px 0; }
-  .btn, button { font: inherit; cursor: pointer; border: 1px solid #c9c6b8; background: #fff; color: #141413; padding: 10px 18px; border-radius: 6px; }
+  .btn, button { display: inline-block; box-sizing: border-box; margin: 4px; font: inherit; line-height: 1.3; cursor: pointer; border: 1px solid #c9c6b8; background: #fff; color: #141413; padding: 10px 18px; border-radius: 6px; }
   .btn:hover, button:hover { background: #f0eee6; }
   .primary { background: #d97757; border-color: #c4623f; color: #fff; }
   .primary:hover { background: #c4623f; }
   .primary[disabled] { background: #e7c3b4; border-color: #e7c3b4; cursor: default; }
   #file { position: absolute; left: -9999px; }
   label { margin-right: 6px; }
-  select { font: inherit; padding: 6px; }
+  select { font: inherit; padding: 6px; background: #fff; color: #141413; border: 1px solid #c9c6b8; border-radius: 6px; }
   #fileName, #message { color: #6b6a63; font-size: 14px; word-wrap: break-word; }
   #message.error { color: #b3261e; }
 
@@ -39,48 +45,85 @@
   #statusbar { display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; -webkit-justify-content: space-between; justify-content: space-between; padding: 8px 4px; }
   #status { color: #6b6a63; }
 
+  /* ad banner: menu only, bottom centre, in the page flow (never over the UI) */
+  #adBox { text-align: center; padding: 10px 0 4px; }
+  #adLabel { font-size: 11px; color: #8a897f; margin-bottom: 2px; }
+  #adLink { display: inline-block; line-height: 0; max-width: 100%; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+  #adImg { max-width: 100%; max-height: 120px; height: auto; border: 0; -webkit-user-drag: none; }
+
+  #toast { position: fixed; left: 50%; bottom: 70px; -webkit-transform: translateX(-50%); transform: translateX(-50%); background: #141413; color: #fff; padding: 8px 16px; border-radius: 20px; font-size: 14px; z-index: 10; }
+
+  footer { text-align: center; padding-top: 8px; line-height: 0; }
+  footer a { display: inline-block; }
+  footer svg { border: 0; }
+
+  /* dark theme (plain class, no CSS variables, so old engines still work) */
+  body.dark { background: #1f1e1d; color: #f0eee6; }
+  body.dark .sub, body.dark #fileName, body.dark #message, body.dark #status { color: #a8a69c; }
+  body.dark #message.error { color: #f2766d; }
+  body.dark .btn, body.dark button, body.dark select { background: #2b2a28; color: #f0eee6; border-color: #4a4843; }
+  body.dark .btn:hover, body.dark button:hover { background: #3a3835; }
+  body.dark .primary { background: #d97757; border-color: #c4623f; color: #fff; }
+  body.dark .primary:hover { background: #c4623f; }
+  body.dark .primary[disabled] { background: #5a4338; border-color: #5a4338; color: #bbb; }
+  body.dark .ans.wrong { background: #d9534f; border-color: #b52b27; color: #fff; }
+  body.dark .ans.right { background: #3c9d4a; border-color: #2b7a37; color: #fff; }
+  body.dark #adLabel { color: #8a897f; }
+  body.dark #toast { background: #f0eee6; color: #141413; }
+
   /* phones / portrait: question on top, answers below */
   @media (max-width: 700px), (orientation: portrait) {
     #board { -webkit-flex-direction: column; flex-direction: column; }
     #question { font-size: 30px; }
     .ans { font-size: 18px; }
   }
-
-  footer { text-align: center; padding-top: 8px; line-height: 0; }
-  footer a { display: inline-block; }
-  footer svg { border: 0; }
 </style>
 </head>
 <body>
 <div id="app">
 
+  <div id="topbar">
+    <div>
+      <label for="lang" data-i18n="Language:">Language:</label>
+      <select id="lang"><option value="auto" data-i18n="Auto" data-icon="&#127760;">Auto</option></select>
+    </div>
+    <div>
+      <label for="theme" data-i18n="Theme:">Theme:</label>
+      <select id="theme">
+        <option value="auto" data-i18n="Auto" data-icon="&#127763;">Auto</option>
+        <option value="light" data-i18n="Light" data-icon="&#9728;&#65039;">Light</option>
+        <option value="dark" data-i18n="Dark" data-icon="&#127769;">Dark</option>
+      </select>
+    </div>
+  </div>
+
   <div id="menu" class="screen">
     <h1>MonoWordTest</h1>
-    <p class="sub">Guess the translation. Load a .txt file with lines like <b>word - translation</b>.</p>
+    <p class="sub" data-i18n="Guess the translation. Load a .txt file where each line is: word - translation">Guess the translation. Load a .txt file where each line is: word - translation</p>
 
     <div class="row">
-      <label class="btn" for="file">Browse&hellip;</label>
+      <label class="btn" for="file" data-i18n="Browse…">Browse&hellip;</label>
       <input type="file" id="file" accept=".txt,text/plain">
-      <button type="button" id="builtinBtn">Use built-in RU &#8596; EN dictionary</button>
+      <button type="button" id="builtinBtn" data-i18n="Use built-in RU ↔ EN dictionary">Use built-in RU &#8596; EN dictionary</button>
     </div>
     <div class="row" id="fileName">No file selected</div>
 
     <div class="row">
-      <label for="count">Answer options:</label>
+      <label for="count" data-i18n="Answer options:">Answer options:</label>
       <select id="count">
         <option>2</option><option>3</option><option selected>4</option><option>5</option>
         <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option>
       </select>
     </div>
     <div class="row">
-      <label for="dir">Show:</label>
+      <label for="dir" data-i18n="Show:">Show:</label>
       <select id="dir">
-        <option value="rand" selected>Random side</option>
-        <option value="ab">Left of " - " (guess the right)</option>
-        <option value="ba">Right of " - " (guess the left)</option>
+        <option value="rand" selected data-i18n="Random side">Random side</option>
+        <option value="ab" data-i18n='Left of " - " (guess the right)'>Left of " - " (guess the right)</option>
+        <option value="ba" data-i18n='Right of " - " (guess the left)'>Right of " - " (guess the left)</option>
       </select>
     </div>
-    <div class="row"><button type="button" id="startBtn" class="primary" disabled>Start</button></div>
+    <div class="row"><button type="button" id="startBtn" class="primary" disabled data-i18n="Start">Start</button></div>
     <div class="row" id="message"></div>
   </div>
 
@@ -91,8 +134,14 @@
     </div>
     <div id="statusbar">
       <span id="status"></span>
-      <button type="button" id="closeBtn">Close</button>
+      <button type="button" id="closeBtn" data-i18n="Close">Close</button>
     </div>
+  </div>
+
+  <!-- Embedded ad banner (menu screen only). Content comes from ads.js, baked into the app. -->
+  <div id="adBox" class="hidden">
+    <div id="adLabel"></div>
+    <a id="adLink" href="#" target="_blank" rel="noopener noreferrer"><img id="adImg" alt="" draggable="false"></a>
   </div>
 
   <footer>
@@ -118,7 +167,10 @@
     </a>
   </footer>
 </div>
+<div id="toast" class="hidden"></div>
 
+<script src="translations.js" charset="utf-8"></script>
+<script src="ads.js" charset="utf-8"></script>
 <!-- Built-in dictionary (defines BUILTIN_DICTIONARY). Optional: the app works without it. -->
 <script src="dictionary.js" charset="utf-8"></script>
 <script>
@@ -129,12 +181,22 @@
   var SEPARATOR = ' - ';      // space-hyphen-space; a bare "-" inside a word is NOT a separator
   var ROUND_DELAY = 5;        // seconds between rounds
   var MAX_PAIRS = 500000;     // safety cap for huge files
+  var LONG_PRESS_MS = 600;    // hold time on the banner to copy its link
 
-  var pairs = [];             // [{a: 'left', b: 'right'}, ...]
+  var LANGS = (typeof MWT_LANGS !== 'undefined' && MWT_LANGS) ? MWT_LANGS : { en: { name: 'English', flag: '\uD83C\uDDEC\uD83C\uDDE7', strings: {} } };
+  var ADS = (typeof MWT_ADS !== 'undefined' && MWT_ADS && MWT_ADS.length) ? MWT_ADS : [];
+
+  var pairs = [];
   var locked = false;
   var tickTimer = null;
   var round = null;
+  var langCode = 'en';
+  var fileState = { key: 'No file selected', raw: null };
+  var msgState = { key: '', params: null, error: false };
+  var statusState = { key: '', params: null };
+  var currentAd = null, lastAd = -1;
 
+  /* ---------- helpers ---------- */
   function $(id) { return document.getElementById(id); }
   function setText(el, t) { if ('textContent' in el) { el.textContent = t; } else { el.innerText = t; } }
   function on(el, ev, fn) { if (el.addEventListener) { el.addEventListener(ev, fn, false); } else if (el.attachEvent) { el.attachEvent('on' + ev, fn); } }
@@ -142,11 +204,92 @@
   function delClass(el, c) { el.className = (' ' + el.className + ' ').replace(' ' + c + ' ', ' ').replace(/^\s+|\s+$/g, ''); }
   function randInt(n) { return Math.floor(Math.random() * n); }
   function trim(s) { return s.replace(/^\s+|\s+$/g, ''); }
+  function stopEvent(e) { if (e.preventDefault) { e.preventDefault(); } else { e.returnValue = false; } }
+  function saveSetting(k, v) { try { window.localStorage.setItem('mwt_' + k, v); } catch (e) { } }
+  function loadSetting(k) { try { return window.localStorage.getItem('mwt_' + k); } catch (e) { return null; } }
 
-  function showMessage(text, isError) {
-    var m = $('message');
-    setText(m, text || '');
-    m.className = isError ? 'error' : '';
+  /* ---------- i18n ---------- */
+  function findLang(tag) {
+    for (var k in LANGS) { if (LANGS.hasOwnProperty(k) && k.toLowerCase() === tag) { return k; } }
+    return null;
+  }
+  function detectLang() {
+    var list = [];
+    try {
+      if (navigator.languages && navigator.languages.length) { list = navigator.languages; }
+      else { list = [navigator.language || navigator.userLanguage || '']; }
+    } catch (e) { }
+    for (var i = 0; i < list.length; i++) {
+      var tag = String(list[i] || '').toLowerCase().replace('_', '-');
+      if (!tag) { continue; }
+      var code = findLang(tag) || findLang(tag.split('-')[0]);
+      if (code) { return code; }
+    }
+    return 'en';
+  }
+  function currentLangCode() {
+    var pref = $('lang').value;
+    if (pref && pref !== 'auto' && LANGS.hasOwnProperty(pref)) { return pref; }
+    return detectLang();
+  }
+  function t(key, params) {
+    var s = key, L = LANGS[langCode];
+    if (L && L.strings && L.strings.hasOwnProperty(key) && L.strings[key]) { s = L.strings[key]; }
+    if (params) {
+      for (var p in params) { if (params.hasOwnProperty(p)) { s = s.split('{' + p + '}').join(String(params[p])); } }
+    }
+    return s;
+  }
+  function applyLang() {
+    langCode = currentLangCode();
+    document.documentElement.lang = langCode;
+    var els = document.querySelectorAll('[data-i18n]');
+    for (var i = 0; i < els.length; i++) {
+      var icon = els[i].getAttribute('data-icon');
+      setText(els[i], (icon ? icon + ' ' : '') + t(els[i].getAttribute('data-i18n')));
+    }
+    renderFile(); renderMessage(); renderStatus(); renderAdText();
+  }
+  function buildLangMenu() {
+    var sel = $('lang');
+    for (var k in LANGS) {
+      if (!LANGS.hasOwnProperty(k)) { continue; }
+      var o = document.createElement('option');
+      o.value = k;
+      setText(o, (LANGS[k].flag ? LANGS[k].flag + ' ' : '') + (LANGS[k].name || k));
+      sel.appendChild(o);
+    }
+    var saved = loadSetting('lang');
+    sel.value = (saved && (saved === 'auto' || LANGS.hasOwnProperty(saved))) ? saved : 'auto';
+  }
+
+  /* dynamic texts that must be re-rendered when the language changes */
+  function renderFile() { setText($('fileName'), fileState.raw !== null ? fileState.raw : t(fileState.key)); }
+  function setMessage(key, params, isError) { msgState = { key: key, params: params || null, error: !!isError }; renderMessage(); }
+  function renderMessage() {
+    setText($('message'), msgState.key ? t(msgState.key, msgState.params) : '');
+    $('message').className = msgState.error ? 'error' : '';
+  }
+  function setStatus(key, params) { statusState = { key: key, params: params || null }; renderStatus(); }
+  function renderStatus() { setText($('status'), statusState.key ? t(statusState.key, statusState.params) : ''); }
+
+  /* ---------- theme ---------- */
+  var mq = null;
+  try { mq = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null; } catch (e) { mq = null; }
+  function applyTheme() {
+    var pref = $('theme').value;
+    var dark = pref === 'dark' || (pref === 'auto' && mq && mq.matches);
+    if (dark) { addClass(document.body, 'dark'); } else { delClass(document.body, 'dark'); }
+  }
+
+  /* ---------- toast ---------- */
+  var toastTimer = null;
+  function showToast(key) {
+    var el = $('toast');
+    setText(el, t(key));
+    delClass(el, 'hidden');
+    if (toastTimer) { clearTimeout(toastTimer); }
+    toastTimer = setTimeout(function () { addClass(el, 'hidden'); }, 2000);
   }
 
   /* ---------- parsing: never throws, silently skips bad lines ---------- */
@@ -170,49 +313,48 @@
 
   function loadDictionary(text, label) {
     var parsed = parseText(text);
+    fileState = label.key ? { key: label.key, raw: null } : { key: '', raw: label.raw };
+    renderFile();
     if (parsed.length < 2) {
       pairs = [];
       $('startBtn').disabled = true;
-      setText($('fileName'), label);
-      showMessage('No usable lines found. Each line must look like: word - translation (at least 2 lines).', true);
+      setMessage('No usable lines found. Each line must look like: word - translation (at least 2 lines).', null, true);
       return;
     }
     pairs = parsed;
     $('startBtn').disabled = false;
-    setText($('fileName'), label);
-    showMessage('Loaded ' + pairs.length + ' entries. Choose options and press Start.', false);
+    setMessage('Loaded {n} entries. Choose options and press Start.', { n: pairs.length }, false);
   }
 
   /* ---------- file reading (UTF-8, falls back to Windows-1251) ---------- */
   function readFile(file) {
     if (typeof FileReader === 'undefined') {
-      showMessage('This browser cannot read files. Use the built-in dictionary.', true);
+      setMessage('This browser cannot read files. Use the built-in dictionary.', null, true);
       return;
     }
     var r = new FileReader();
-    r.onerror = function () { showMessage('Could not read the file.', true); };
+    r.onerror = function () { setMessage('Could not read the file.', null, true); };
     r.onload = function () {
       var txt = r.result;
       if (typeof txt === 'string' && txt.indexOf('\uFFFD') >= 0) {
         var r2 = new FileReader();
-        r2.onerror = function () { loadDictionary(txt, file.name); };
-        r2.onload = function () { loadDictionary(r2.result, file.name + ' (Windows-1251)'); };
-        try { r2.readAsText(file, 'windows-1251'); } catch (e) { loadDictionary(txt, file.name); }
+        r2.onerror = function () { loadDictionary(txt, { raw: file.name }); };
+        r2.onload = function () { loadDictionary(r2.result, { raw: file.name + ' (Windows-1251)' }); };
+        try { r2.readAsText(file, 'windows-1251'); } catch (e) { loadDictionary(txt, { raw: file.name }); }
       } else {
-        loadDictionary(txt, file.name);
+        loadDictionary(txt, { raw: file.name });
       }
     };
-    try { r.readAsText(file, 'UTF-8'); } catch (e) { showMessage('Could not read the file.', true); }
+    try { r.readAsText(file, 'UTF-8'); } catch (e) { setMessage('Could not read the file.', null, true); }
   }
 
   /* ---------- game ---------- */
   function shuffle(arr) {
     for (var i = arr.length - 1; i > 0; i--) {
-      var j = randInt(i + 1), t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+      var j = randInt(i + 1), tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
     }
     return arr;
   }
-
   function stopTimer() { if (tickTimer) { clearInterval(tickTimer); tickTimer = null; } }
 
   function newRound() {
@@ -244,10 +386,8 @@
     setText($('question'), prompt);
     var box = $('answers');
     box.innerHTML = '';
-    for (var i = 0; i < options.length; i++) {
-      box.appendChild(makeButton(options[i]));
-    }
-    setText($('status'), 'Pick the translation.');
+    for (var i = 0; i < options.length; i++) { box.appendChild(makeButton(options[i])); }
+    setStatus('Pick the translation.');
   }
 
   function makeButton(text) {
@@ -270,27 +410,95 @@
 
   function startCountdown() {
     var left = ROUND_DELAY;
-    setText($('status'), 'Correct! Next word in ' + left + '...');
+    setStatus('Correct! Next word in {n}...', { n: left });
     tickTimer = setInterval(function () {
       left--;
       if (left <= 0) { newRound(); }
-      else { setText($('status'), 'Correct! Next word in ' + left + '...'); }
+      else { setStatus('Correct! Next word in {n}...', { n: left }); }
     }, 1000);
   }
 
+  /* ---------- ad banner (menu only; picked at random every time the menu is shown) ---------- */
+  function refreshAd() {
+    var box = $('adBox');
+    if (!ADS.length) { addClass(box, 'hidden'); return; }
+    var idx = randInt(ADS.length);
+    if (ADS.length > 1 && idx === lastAd) { idx = (idx + 1 + randInt(ADS.length - 1)) % ADS.length; }
+    lastAd = idx;
+    currentAd = ADS[idx];
+    $('adImg').src = 'data:' + currentAd.mime + ';base64,' + currentAd.data;   // image lives inside the app
+    $('adLink').href = currentAd.url;
+    renderAdText();
+    delClass(box, 'hidden');
+  }
+  function renderAdText() {
+    setText($('adLabel'), t('Ad'));
+    if (currentAd) {
+      $('adImg').alt = currentAd.alt || '';
+      $('adLink').title = t('Click to open. Press and hold to copy the link.');
+    }
+  }
+  function hideAd() { addClass($('adBox'), 'hidden'); }
+
+  function copyText(text, done) {
+    function fallback() {
+      var ok = false;
+      try {
+        var ta = document.createElement('textarea');
+        ta.value = text; ta.style.position = 'fixed'; ta.style.left = '-9999px';
+        document.body.appendChild(ta); ta.focus(); ta.select();
+        ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+      } catch (e) { ok = false; }
+      done(ok);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () { done(true); }, fallback);
+    } else { fallback(); }
+  }
+
+  var pressTimer = null, pressFired = false;
+  function cancelPress() { if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; } }
+  function startPress() {
+    cancelPress();
+    pressFired = false;
+    pressTimer = setTimeout(function () {
+      pressTimer = null;
+      pressFired = true;
+      if (currentAd) {
+        copyText(currentAd.url, function (ok) { showToast(ok ? 'Link copied' : 'Could not copy the link'); });
+      }
+    }, LONG_PRESS_MS);
+  }
+  (function wireAd() {
+    var a = $('adLink');
+    on(a, 'mousedown', startPress);
+    on(a, 'touchstart', startPress);
+    on(a, 'mouseup', cancelPress);
+    on(a, 'mouseleave', cancelPress);
+    on(a, 'touchend', cancelPress);
+    on(a, 'touchmove', cancelPress);
+    on(a, 'touchcancel', cancelPress);
+    on(a, 'contextmenu', stopEvent);                 // long press must not open the browser's own menu
+    on(a, 'click', function (e) {
+      if (pressFired) { pressFired = false; stopEvent(e); }   // a long press only copies, it does not open
+    });
+  })();
+
+  /* ---------- screens ---------- */
   function showGame() {
     addClass($('menu'), 'hidden');
+    hideAd();
     delClass($('game'), 'hidden');
     newRound();
   }
-
   function showMenu() {
     stopTimer();
     locked = false;
     addClass($('game'), 'hidden');
     delClass($('menu'), 'hidden');
+    refreshAd();                                     // new random ad every time the menu appears
   }
-
   function closeApp() {
     stopTimer();
     try { window.close(); } catch (e) { /* not allowed in a plain browser tab */ }
@@ -304,13 +512,27 @@
   });
   on($('builtinBtn'), 'click', function () {
     if (typeof BUILTIN_DICTIONARY === 'string') {
-      loadDictionary(BUILTIN_DICTIONARY, 'Built-in RU \u2194 EN dictionary');
+      loadDictionary(BUILTIN_DICTIONARY, { key: 'Built-in RU ↔ EN dictionary' });
     } else {
-      showMessage('Built-in dictionary (dictionary.js) was not found next to this page.', true);
+      setMessage('Built-in dictionary (dictionary.js) was not found next to this page.', null, true);
     }
   });
   on($('startBtn'), 'click', function () { if (pairs.length > 1) { showGame(); } });
   on($('closeBtn'), 'click', closeApp);
+  on($('lang'), 'change', function () { saveSetting('lang', $('lang').value); applyLang(); });
+  on($('theme'), 'change', function () { saveSetting('theme', $('theme').value); applyTheme(); });
+  if (mq) {
+    if (mq.addEventListener) { mq.addEventListener('change', applyTheme); }
+    else if (mq.addListener) { mq.addListener(applyTheme); }
+  }
+
+  /* ---------- init ---------- */
+  buildLangMenu();
+  var savedTheme = loadSetting('theme');
+  $('theme').value = (savedTheme === 'light' || savedTheme === 'dark') ? savedTheme : 'auto';
+  applyTheme();
+  applyLang();
+  refreshAd();
 })();
 </script>
 </body>
