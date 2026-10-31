@@ -1,0 +1,10 @@
+{
+	"luci-app-monowordtest": {
+		"description": "Grant access to MonoWordTest",
+		"read": {
+			"file": {
+				"/etc/openwrt_release": [ "read" ]
+			}
+		}
+	}
+}

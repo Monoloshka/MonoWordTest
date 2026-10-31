@@ -1,0 +1,13 @@
+{
+	"admin/services/monowordtest": {
+		"title": "MonoWordTest",
+		"order": 90,
+		"action": {
+			"type": "view",
+			"path": "monowordtest/main"
+		},
+		"depends": {
+			"acl": [ "luci-app-monowordtest" ]
+		}
+	}
+}

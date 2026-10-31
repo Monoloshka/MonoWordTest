@@ -46,9 +46,10 @@ Auto (follows the system dark/light setting), Light or Dark - selectable in the 
 * Click/tap opens the banner's link in the browser. **Press and hold (~0.6 s) copies the link** instead.
 * A small "Ad" label (translated) is shown above the banner.
 
-**Add / remove an ad:** put the image (`.svg .png .jpg .gif .webp`) into `ads/`, add or delete a line in
+**Add / remove an ad:** put the image (PNG recommended; also `.jpg .gif .webp .svg`) into `ads/`, add or delete a line in
 `ads/ads.txt` (`file | https://link | alt text`), then run `python3 tools/build_ads.py` and rebuild your app.
-The two included banners are samples pointing to example.com - replace them. If `ads.txt` has no entries the ad area is not shown.
+Optimize PNGs first (e.g. with FileOptimizer): they are stored as base64, which adds about 33%.
+The two included PNG banners are samples pointing to example.com - replace them. If `ads.txt` has no entries the ad area is not shown.
 
 (Embedded means "not a setting", not tamper-proof: anyone can unpack an APK/asar and edit the files.)
 
@@ -95,9 +96,34 @@ Commit the generated `ads.js` (run `python3 tools/build_ads.py` after changing a
 | `...-linux-*.AppImage`, `.deb`, `.rpm`, `.pacman`, `.tar.gz` | Linux x64 / arm64 (aarch64) | AppImage is a single file |
 | `.snap`, `.flatpak` | Linux | Experimental |
 | `...-android.apk` | Android | Debug-signed (installable; not for Google Play) |
+| `luci-app-monowordtest_*_all.ipk`, `luci-app-monowordtest-*.apk` | OpenWrt (every CPU architecture) | See "OpenWrt" below |
 | `...-web.zip` | Any browser, incl. ReactOS and Win 9x/2000 with an old browser | Plain files |
 
 Not built by CI: AUR (`packaging/aur/PKGBUILD` template), Nix (`packaging/nix/default.nix` template), `.tazpkg`.
 Windows 95/98/Me/2000 have no modern runtime: use the web zip in an old browser, or a native port.
 Wine/Proton: the exe detects Wine and turns off GPU acceleration and the Chromium sandbox automatically.
 None of these CI builds have been run yet; expect to fix small things on the first run (experimental jobs are allowed to fail without stopping the rest).
+
+## OpenWrt (LuCI: Services > MonoWordTest)
+
+The router only serves the static files; the game runs in the browser of the PC/phone that opens LuCI.
+That is why one package fits **every** OpenWrt CPU architecture (it is built as arch `all` / `noarch`).
+It needs `luci-base` (a working LuCI web interface). Installed size is about 720 KB (package about 280 KB).
+
+| Your OpenWrt | Package manager | Install |
+|--------------|-----------------|---------|
+| 24.10 and older | opkg | `opkg install /tmp/luci-app-monowordtest_1.0.0-r1_all.ipk` |
+| 25.12 and newer | apk | `apk add --allow-untrusted /tmp/luci-app-monowordtest-1.0.0-r1.apk` |
+
+Copy the file to the router first, e.g. `scp -O luci-app-monowordtest_1.0.0-r1_all.ipk root@192.168.1.1:/tmp/`
+(`-O` is needed when the router has no sftp-server). Then open LuCI -> **Services -> MonoWordTest**
+(press Ctrl+F5 or log in again if the entry is missing). Remove with `opkg remove luci-app-monowordtest`
+or `apk del luci-app-monowordtest`.
+
+If the menu entry does not appear: `rm -rf /tmp/luci-* && /etc/init.d/rpcd restart`.
+
+How it is built: `openwrt/build.sh` stages the files (`openwrt/files/` + the web files from the repo root) and
+packs them: the `.ipk` with OpenWrt's own `ipkg-build` script (pinned to the v24.10.0 tag), the `.apk` with
+`apk mkpkg` (apk-tools 3, the tool OpenWrt uses). Packages are unsigned, hence `--allow-untrusted` for apk.
+The page is served from `/www/luci-static/resources/monowordtest/`, the LuCI view is
+`/www/luci-static/resources/view/monowordtest/main.js` (an iframe), the menu entry is in `/usr/share/luci/menu.d/`.

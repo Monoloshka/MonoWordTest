@@ -1,0 +1,7 @@
+# One ad per line:  image file (in this folder) | link opened in the browser | alt text
+# Use .png (also supported: .jpg .jpeg .gif .webp .svg). Optimize PNGs first (e.g. FileOptimizer):
+# images are stored as base64 inside ads.js, which makes them ~33% bigger.
+# After editing, run:  python3 tools/build_ads.py
+# Remove a line (or comment it out with #) to remove that ad. Replace the SAMPLE lines below with your own.
+banner1.png | https://example.com/?ad=1 | Sample ad 1
+banner2.png | https://example.com/?ad=2 | Sample ad 2
