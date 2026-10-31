@@ -11,20 +11,20 @@ permissions:
   contents: read
 
 env:
-  NODE_VERSION: '20'
+  NODE_VERSION: '22'
 
 jobs:
   # ---------------------------------------------------------------- universal
   web:
     name: Web zip (any browser, ReactOS, Win 9x/2000 with an old browser)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Zip
         run: |
           VER=$(node -p "require('./package.json').version")
           mkdir out && zip -q "out/MonoWordTest-${VER}-web.zip" index.html translations.js ads.js dictionary.js dictionary.txt claude-badge.svg README.md
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with: { name: MonoWordTest-web, path: out/*.zip }
 
   # ---------------------------------------------------------------- Windows 10/11 (+ Wine/Proton)
@@ -36,14 +36,14 @@ jobs:
       matrix:
         arch: [x64, ia32, arm64]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with: { node-version: '${{ env.NODE_VERSION }}' }
       - run: npm install --no-audit --no-fund
         shell: bash
       - run: npx electron-builder --win portable --${{ matrix.arch }} --publish never
         shell: bash
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with: { name: 'MonoWordTest-win10-11-${{ matrix.arch }}', path: 'dist/MonoWordTest-*.exe' }
 
   # ---------------------------------------------------------------- Windows 7 / 8 / 8.1 (+ Wine/Proton)
@@ -52,8 +52,8 @@ jobs:
     runs-on: windows-latest
     continue-on-error: true
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with: { node-version: '${{ env.NODE_VERSION }}' }
       - shell: bash
         run: |
@@ -62,7 +62,7 @@ jobs:
           npx electron-builder --win portable --x64 --ia32 --publish never \
             -c.electronVersion=22.3.27 \
             '-c.portable.artifactName=MonoWordTest-${version}-win7-8-8.1-${arch}-portable.${ext}'
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with: { name: MonoWordTest-win7-8-8.1, path: 'dist/MonoWordTest-*.exe' }
 
   # ---------------------------------------------------------------- Windows installer-style package
@@ -71,23 +71,23 @@ jobs:
     runs-on: windows-latest
     continue-on-error: true
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with: { node-version: '${{ env.NODE_VERSION }}' }
       - shell: bash
         run: |
           npm install --no-audit --no-fund
           npx electron-builder --win msi --x64 --publish never
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with: { name: MonoWordTest-win-msi, path: 'dist/MonoWordTest-*.msi' }
 
   # ---------------------------------------------------------------- Windows XP / Vista (experimental)
   win-xp:
     name: Windows XP/Vista zip (NW.js 0.14.7, experimental)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     continue-on-error: true
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Assemble NW.js bundle
         run: |
           set -e
@@ -105,7 +105,7 @@ jobs:
           mv "$NW" MonoWordTest-winxp-vista
           mkdir out
           zip -qr "out/MonoWordTest-${VER}-winxp-vista-ia32.zip" MonoWordTest-winxp-vista
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with: { name: MonoWordTest-winxp-vista, path: out/*.zip }
 
   # ---------------------------------------------------------------- macOS
@@ -116,57 +116,65 @@ jobs:
     env:
       CSC_IDENTITY_AUTO_DISCOVERY: 'false'   # unsigned builds
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with: { node-version: '${{ env.NODE_VERSION }}' }
       - run: npm install --no-audit --no-fund
       - run: npx electron-builder --mac zip dmg --x64 --arm64 --publish never
-      - name: .pkg (optional)
+      - name: .pkg x64 (optional)
         continue-on-error: true
-        run: npx electron-builder --mac pkg --x64 --arm64 --publish never
-      - uses: actions/upload-artifact@v4
+        run: npx electron-builder --mac pkg --x64 --publish never
+      - name: .pkg arm64 (optional)
+        continue-on-error: true
+        run: npx electron-builder --mac pkg --arm64 --publish never
+      - uses: actions/upload-artifact@v7
         with: { name: MonoWordTest-macos, path: 'dist/MonoWordTest-*.*' }
 
   # ---------------------------------------------------------------- Linux
   linux:
     name: Linux AppImage, deb, rpm, pacman, tar.gz (${{ matrix.arch }})
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     continue-on-error: ${{ matrix.arch == 'arm64' }}
     strategy:
       fail-fast: false
       matrix:
         arch: [x64, arm64]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with: { node-version: '${{ env.NODE_VERSION }}' }
       - run: sudo apt-get update && sudo apt-get install -y rpm libarchive-tools
       - run: npm install --no-audit --no-fund
-      - run: npx electron-builder --linux AppImage deb rpm pacman tar.gz --${{ matrix.arch }} --publish never
-      - uses: actions/upload-artifact@v4
+      - run: npx electron-builder --linux AppImage deb pacman tar.gz --${{ matrix.arch }} --publish never
+      - name: rpm (separate step so a failure cannot lose the other formats)
+        continue-on-error: true
+        run: |
+          npx electron-builder --linux rpm --${{ matrix.arch }} --publish never || \
+          npx electron-builder --linux rpm --${{ matrix.arch }} --publish never -c.rpm.compression=gzip
+      - uses: actions/upload-artifact@v7
         with: { name: 'MonoWordTest-linux-${{ matrix.arch }}', path: 'dist/MonoWordTest-*' }
 
   linux-snap:
     name: Linux .snap (experimental)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     continue-on-error: true
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with: { node-version: '${{ env.NODE_VERSION }}' }
       - run: sudo snap install snapcraft --classic
       - run: npm install --no-audit --no-fund
       - run: npx electron-builder --linux snap --x64 --publish never
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with: { name: MonoWordTest-linux-snap, path: 'dist/*.snap' }
 
   linux-flatpak:
     name: Linux .flatpak (experimental)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     continue-on-error: true
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with: { node-version: '${{ env.NODE_VERSION }}' }
       - run: |
           sudo apt-get update && sudo apt-get install -y flatpak flatpak-builder elfutils
@@ -174,19 +182,46 @@ jobs:
           flatpak install --user -y flathub org.freedesktop.Platform//24.08 org.freedesktop.Sdk//24.08 org.electronjs.Electron2.BaseApp//24.08
       - run: npm install --no-audit --no-fund
       - run: npx electron-builder --linux flatpak --x64 --publish never
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with: { name: MonoWordTest-linux-flatpak, path: 'dist/*.flatpak' }
+
+  # ---------------------------------------------------------------- OpenWrt (LuCI: Services > MonoWordTest)
+  openwrt:
+    name: OpenWrt .ipk (opkg) and .apk (apk-tools)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - name: Version
+        id: ver
+        run: echo "v=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+      - name: .ipk (OpenWrt 24.10 and older)
+        run: sudo MWT_URL="https://github.com/${{ github.repository }}" sh openwrt/build.sh ipk "${{ steps.ver.outputs.v }}" out
+      - name: Check .ipk contents
+        run: |
+          f=$(ls out/*.ipk); mkdir chk && tar xzf "$f" -C chk
+          tar tzf chk/control.tar.gz; tar tzf chk/data.tar.gz | grep -E 'menu.d|main.js|index.html'
+      - name: .apk (OpenWrt 25.12 and newer), built with Alpine's apk-tools 3
+        continue-on-error: true
+        run: |
+          docker run --rm -v "$PWD:/w" -w /w -e MWT_URL="https://github.com/${{ github.repository }}" alpine:edge \
+            sh -c 'apk add --no-cache apk-tools >/dev/null && apk --version && sh openwrt/build.sh apk "$1" out && apk adbdump out/*.apk' sh "${{ steps.ver.outputs.v }}"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: MonoWordTest-openwrt
+          path: |
+            out/*.ipk
+            out/*.apk
 
   # ---------------------------------------------------------------- Android
   android:
     name: Android .apk (Capacitor)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     continue-on-error: true
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with: { node-version: '${{ env.NODE_VERSION }}' }
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with: { distribution: temurin, java-version: '17' }
       - name: Build debug-signed APK
         run: |
@@ -201,25 +236,25 @@ jobs:
           (cd android && chmod +x gradlew && ./gradlew assembleDebug)
           mkdir out
           cp android/app/build/outputs/apk/debug/app-debug.apk "out/MonoWordTest-${VER}-android.apk"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with: { name: MonoWordTest-android, path: out/*.apk }
 
   # ---------------------------------------------------------------- GitHub Release (tags only)
   release:
     name: Attach everything to the GitHub Release
     if: ${{ !cancelled() && startsWith(github.ref, 'refs/tags/v') }}
-    needs: [web, win-modern, win-legacy, win-msi, win-xp, macos, linux, linux-snap, linux-flatpak, android]
-    runs-on: ubuntu-latest
+    needs: [web, win-modern, win-legacy, win-msi, win-xp, macos, linux, linux-snap, linux-flatpak, openwrt, android]
+    runs-on: ubuntu-24.04
     permissions:
       contents: write
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           pattern: MonoWordTest-*
           merge-multiple: true
           path: release
       - run: ls -la release
-      - uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v3
         with:
           files: release/*
           generate_release_notes: true
