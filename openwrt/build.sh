@@ -28,9 +28,18 @@ mkdir -p "$STAGE"
 cp -R "$HERE/files/." "$STAGE/"
 WEB=$STAGE/www/luci-static/resources/monowordtest
 mkdir -p "$WEB"
-for f in index.html translations.js ads.js dictionary.js; do
+for f in index.html translations.js dictionary.js; do
 	cp "$ROOT/$f" "$WEB/$f"
 done
+# Routers have little flash/RAM: ads are plain text links here, never images.
+if [ -f "$ROOT/ads.text.js" ]; then
+	cp "$ROOT/ads.text.js" "$WEB/ads.js"
+elif command -v python3 >/dev/null 2>&1; then
+	python3 "$ROOT/tools/build_ads.py" --text-only --out "$WEB/ads.js"
+else
+	echo "warning: no ads.text.js and no python3 - building without ads" >&2
+	echo 'var MWT_ADS = [];' > "$WEB/ads.js"
+fi
 find "$STAGE" -type d -exec chmod 755 {} +
 find "$STAGE" -type f -exec chmod 644 {} +
 chmod 755 "$HERE/scripts/postinst.sh" "$HERE/scripts/postrm.sh"
