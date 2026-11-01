@@ -1,10 +1,10 @@
 {
   "name": "monowordtest",
   "productName": "MonoWordTest",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Translation guessing game: load word - translation lines and pick the right answer.",
-  "author": { "name": "YOUR-NAME", "email": "you@example.com" },
-  "homepage": "https://github.com/YOUR-NAME/MonoWordTest",
+  "author": { "name": "Dmitriy Yakovenko (Monoloshka), Claude" },
+  "homepage": "https://github.com/Monoloshka/MonoWordTest",
   "license": "MIT",
   "main": "desktop/main.js",
   "private": true,
