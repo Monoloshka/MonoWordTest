@@ -143,6 +143,8 @@ jobs:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
         with: { node-version: '${{ env.NODE_VERSION }}' }
+      - name: Icons (all sizes from build/icon.png)
+        run: sudo apt-get update -qq && sudo apt-get install -y python3-pil && python3 tools/make_icons.py
       - run: sudo apt-get update && sudo apt-get install -y rpm libarchive-tools
       - run: npm install --no-audit --no-fund
       - run: npx electron-builder --linux AppImage deb pacman tar.gz --${{ matrix.arch }} --publish never
@@ -162,6 +164,8 @@ jobs:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
         with: { node-version: '${{ env.NODE_VERSION }}' }
+      - name: Icons (all sizes from build/icon.png)
+        run: sudo apt-get update -qq && sudo apt-get install -y python3-pil && python3 tools/make_icons.py
       - run: sudo snap install snapcraft --classic
       - run: npm install --no-audit --no-fund
       - run: npx electron-builder --linux snap --x64 --publish never
@@ -176,6 +180,8 @@ jobs:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
         with: { node-version: '${{ env.NODE_VERSION }}' }
+      - name: Icons (all sizes from build/icon.png)
+        run: sudo apt-get update -qq && sudo apt-get install -y python3-pil && python3 tools/make_icons.py
       - run: |
           sudo apt-get update && sudo apt-get install -y flatpak flatpak-builder elfutils
           flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
@@ -194,6 +200,8 @@ jobs:
       - name: Version
         id: ver
         run: echo "v=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+      - name: Text-only ads for the router package
+        run: python3 tools/build_ads.py --text-only --out ads.text.js
       - name: .ipk (OpenWrt 24.10 and older)
         run: sudo MWT_URL="https://github.com/${{ github.repository }}" sh openwrt/build.sh ipk "${{ steps.ver.outputs.v }}" out
       - name: Check .ipk contents
@@ -228,10 +236,12 @@ jobs:
           set -e
           VER=$(node -p "require('./package.json').version")
           mkdir www && cp index.html translations.js ads.js dictionary.js www/
-          npm install --no-save --no-audit --no-fund @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 @capacitor/assets@3
+          npm install --no-save --no-audit --no-fund @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6
           npx cap init MonoWordTest io.github.monowordtest --web-dir=www
           npx cap add android
-          npx @capacitor/assets generate --android || echo "icon generation skipped"
+          sudo apt-get update -qq && sudo apt-get install -y python3-pil
+          python3 tools/make_icons.py --android android/app/src/main/res
+          grep -q 'android:icon="@mipmap/ic_launcher"' android/app/src/main/AndroidManifest.xml || { echo "manifest does not use @mipmap/ic_launcher"; exit 1; }
           npx cap sync android
           (cd android && chmod +x gradlew && ./gradlew assembleDebug)
           mkdir out
