@@ -48,10 +48,10 @@
   /* ad banner: menu only, bottom centre, in the page flow (never over the UI) */
   #adBox { text-align: center; padding: 10px 0 4px; }
   #adLabel { font-size: 11px; color: #8a897f; margin-bottom: 2px; }
-  #adLink { display: inline-block; line-height: 0; max-width: 100%; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+  #adLink { display: inline-block; max-width: 100%; -webkit-user-select: none; -moz-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-user-drag: none; -webkit-tap-highlight-color: transparent; }
+  #adLink.img { line-height: 0; }
   #adImg { max-width: 100%; max-height: 120px; height: auto; border: 0; -webkit-user-drag: none; }
-
-  #toast { position: fixed; left: 50%; bottom: 70px; -webkit-transform: translateX(-50%); transform: translateX(-50%); background: #141413; color: #fff; padding: 8px 16px; border-radius: 20px; font-size: 14px; z-index: 10; }
+  #adText { color: #c4623f; text-decoration: underline; font-size: 15px; }
 
   footer { text-align: center; padding-top: 8px; line-height: 0; }
   footer a { display: inline-block; }
@@ -69,7 +69,7 @@
   body.dark .ans.wrong { background: #d9534f; border-color: #b52b27; color: #fff; }
   body.dark .ans.right { background: #3c9d4a; border-color: #2b7a37; color: #fff; }
   body.dark #adLabel { color: #8a897f; }
-  body.dark #toast { background: #f0eee6; color: #141413; }
+  body.dark #adText { color: #f0a58a; }
 
   /* phones / portrait: question on top, answers below */
   @media (max-width: 700px), (orientation: portrait) {
@@ -141,7 +141,7 @@
   <!-- Embedded ad banner (menu screen only). Content comes from ads.js, baked into the app. -->
   <div id="adBox" class="hidden">
     <div id="adLabel"></div>
-    <a id="adLink" href="#" target="_blank" rel="noopener noreferrer"><img id="adImg" alt="" draggable="false"></a>
+    <a id="adLink" href="#" target="_blank" rel="noopener noreferrer" draggable="false"><img id="adImg" alt="" draggable="false"><span id="adText"></span></a>
   </div>
 
   <footer>
@@ -167,7 +167,6 @@
     </a>
   </footer>
 </div>
-<div id="toast" class="hidden"></div>
 
 <script src="translations.js" charset="utf-8"></script>
 <script src="ads.js" charset="utf-8"></script>
@@ -181,7 +180,6 @@
   var SEPARATOR = ' - ';      // space-hyphen-space; a bare "-" inside a word is NOT a separator
   var ROUND_DELAY = 5;        // seconds between rounds
   var MAX_PAIRS = 500000;     // safety cap for huge files
-  var LONG_PRESS_MS = 600;    // hold time on the banner to copy its link
 
   var LANGS = (typeof MWT_LANGS !== 'undefined' && MWT_LANGS) ? MWT_LANGS : { en: { name: 'English', flag: '\uD83C\uDDEC\uD83C\uDDE7', strings: {} } };
   var ADS = (typeof MWT_ADS !== 'undefined' && MWT_ADS && MWT_ADS.length) ? MWT_ADS : [];
@@ -280,16 +278,6 @@
     var pref = $('theme').value;
     var dark = pref === 'dark' || (pref === 'auto' && mq && mq.matches);
     if (dark) { addClass(document.body, 'dark'); } else { delClass(document.body, 'dark'); }
-  }
-
-  /* ---------- toast ---------- */
-  var toastTimer = null;
-  function showToast(key) {
-    var el = $('toast');
-    setText(el, t(key));
-    delClass(el, 'hidden');
-    if (toastTimer) { clearTimeout(toastTimer); }
-    toastTimer = setTimeout(function () { addClass(el, 'hidden'); }, 2000);
   }
 
   /* ---------- parsing: never throws, silently skips bad lines ---------- */
@@ -418,7 +406,9 @@
     }, 1000);
   }
 
-  /* ---------- ad banner (menu only; picked at random every time the menu is shown) ---------- */
+  /* ---------- ad (menu only; picked at random every time the menu is shown) ----------
+     An entry with image data shows the banner; an entry without it shows a plain text link. */
+  function hostOf(url) { var m = /^https?:\/\/([^\/?#]+)/i.exec(url || ''); return m ? m[1] : url; }
   function refreshAd() {
     var box = $('adBox');
     if (!ADS.length) { addClass(box, 'hidden'); return; }
@@ -426,63 +416,28 @@
     if (ADS.length > 1 && idx === lastAd) { idx = (idx + 1 + randInt(ADS.length - 1)) % ADS.length; }
     lastAd = idx;
     currentAd = ADS[idx];
-    $('adImg').src = 'data:' + currentAd.mime + ';base64,' + currentAd.data;   // image lives inside the app
-    $('adLink').href = currentAd.url;
+    var link = $('adLink'), img = $('adImg'), txt = $('adText');
+    if (currentAd.data) {
+      img.src = 'data:' + currentAd.mime + ';base64,' + currentAd.data;   // image lives inside the app
+      img.alt = currentAd.alt || '';
+      addClass(link, 'img'); delClass(img, 'hidden'); addClass(txt, 'hidden');
+    } else {
+      setText(txt, currentAd.alt || hostOf(currentAd.url));
+      delClass(link, 'img'); addClass(img, 'hidden'); delClass(txt, 'hidden');
+    }
+    link.href = currentAd.url;
     renderAdText();
     delClass(box, 'hidden');
   }
-  function renderAdText() {
-    setText($('adLabel'), t('Ad'));
-    if (currentAd) {
-      $('adImg').alt = currentAd.alt || '';
-      $('adLink').title = t('Click to open. Press and hold to copy the link.');
-    }
-  }
+  function renderAdText() { setText($('adLabel'), t('Ad')); }
   function hideAd() { addClass($('adBox'), 'hidden'); }
 
-  function copyText(text, done) {
-    function fallback() {
-      var ok = false;
-      try {
-        var ta = document.createElement('textarea');
-        ta.value = text; ta.style.position = 'fixed'; ta.style.left = '-9999px';
-        document.body.appendChild(ta); ta.focus(); ta.select();
-        ok = document.execCommand('copy');
-        document.body.removeChild(ta);
-      } catch (e) { ok = false; }
-      done(ok);
-    }
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(function () { done(true); }, fallback);
-    } else { fallback(); }
-  }
-
-  var pressTimer = null, pressFired = false;
-  function cancelPress() { if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; } }
-  function startPress() {
-    cancelPress();
-    pressFired = false;
-    pressTimer = setTimeout(function () {
-      pressTimer = null;
-      pressFired = true;
-      if (currentAd) {
-        copyText(currentAd.url, function (ok) { showToast(ok ? 'Link copied' : 'Could not copy the link'); });
-      }
-    }, LONG_PRESS_MS);
-  }
+  /* The link can be opened, but is not offered for copying: no context menu, no dragging, no selection. */
   (function wireAd() {
     var a = $('adLink');
-    on(a, 'mousedown', startPress);
-    on(a, 'touchstart', startPress);
-    on(a, 'mouseup', cancelPress);
-    on(a, 'mouseleave', cancelPress);
-    on(a, 'touchend', cancelPress);
-    on(a, 'touchmove', cancelPress);
-    on(a, 'touchcancel', cancelPress);
-    on(a, 'contextmenu', stopEvent);                 // long press must not open the browser's own menu
-    on(a, 'click', function (e) {
-      if (pressFired) { pressFired = false; stopEvent(e); }   // a long press only copies, it does not open
-    });
+    on(a, 'contextmenu', stopEvent);
+    on(a, 'dragstart', stopEvent);
+    on(a, 'selectstart', stopEvent);
   })();
 
   /* ---------- screens ---------- */

@@ -37,21 +37,33 @@ Note: Windows does not draw flag emoji (it shows letters such as "RU" instead); 
 
 Auto (follows the system dark/light setting), Light or Dark - selectable in the top bar and remembered.
 
-## Ad banners (menu screen only)
+## Ads (start screen only)
 
-* Banner images are **embedded in the app** (as data URIs inside `ads.js`); nothing is fetched from the internet,
+* Ads are **embedded in the app** (`ads.js`; images as data URIs); nothing is fetched from the internet,
   and there is no user-visible setting for them.
-* Shown at the bottom centre of the start screen, in the page flow (never over the UI), hidden during the game.
-  Every time the start screen appears a random banner is chosen again (never the same one twice in a row).
-* Click/tap opens the banner's link in the browser. **Press and hold (~0.6 s) copies the link** instead.
-* A small "Ad" label (translated) is shown above the banner.
+* Shown at the bottom centre of the start screen, in the page flow (never over the UI) and **never during the game**.
+  Every time the start screen appears a random ad is chosen again (never the same one twice in a row).
+* An ad is either an image banner (PNG recommended) or a plain text link. A click/tap opens the link in the browser.
+  The link is deliberately not offered for copying (no context menu, no dragging, no text selection).
+  This is a convenience barrier only: the address is still visible in the browser status bar or developer tools.
+* A small "Ad" label (translated) is shown above it.
+* **OpenWrt packages contain no images at all** (routers have little flash): every ad becomes a plain text link.
 
-**Add / remove an ad:** put the image (PNG recommended; also `.jpg .gif .webp .svg`) into `ads/`, add or delete a line in
-`ads/ads.txt` (`file | https://link | alt text`), then run `python3 tools/build_ads.py` and rebuild your app.
-Optimize PNGs first (e.g. with FileOptimizer): they are stored as base64, which adds about 33%.
-The two included PNG banners are samples pointing to example.com - replace them. If `ads.txt` has no entries the ad area is not shown.
+**Add / remove an ad:** put the image into `ads/` and add or delete a line in `ads/ads.txt`
+(`file | https://link | text`; write `-` instead of the file for a text-only ad), then run
+`python3 tools/build_ads.py` and rebuild. Optimize PNGs first (e.g. with FileOptimizer): they are stored as
+base64, which adds about 33%. The included samples point to example.com - replace them.
+If `ads.txt` has no entries the ad area is not shown.
 
 (Embedded means "not a setting", not tamper-proof: anyone can unpack an APK/asar and edit the files.)
+
+## App icon
+
+Put your icon at **`build/icon.png`** (square PNG, 1024 px). That is the only source: `tools/make_icons.py` derives
+everything else from it (`build/icons/16..512.png` for Linux/Flatpak/deb/rpm, and the Android launcher icons incl.
+the adaptive/round ones; CI runs it automatically). Flatpak silently drops icons larger than 512 px, which is why
+the extra sizes are needed. After installing a new APK over an old one, uninstall the old one or restart the launcher:
+Android caches launcher icons.
 
 ## Robustness
 
@@ -84,7 +96,7 @@ The Claude badge is an unofficial vector approximation; check Anthropic's brand 
 `.github/workflows/build.yml` builds standalone apps (an optional alternative to the browser).
 Run it from the Actions tab ("Run workflow") or push a tag such as `v1.0.0` to also publish all files to a GitHub Release.
 Before publishing, replace `YOUR-NAME` / `you@example.com` in `package.json` and keep `version` equal to the tag.
-Commit the generated `ads.js` (run `python3 tools/build_ads.py` after changing ads).
+Commit the generated `ads.js` (run `python3 tools/build_ads.py` after changing ads) and `build/icons/` (run `python3 tools/make_icons.py` after changing `build/icon.png`).
 
 | Output | Runs on | Notes |
 |--------|---------|-------|

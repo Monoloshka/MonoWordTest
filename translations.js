@@ -43,10 +43,7 @@ var MWT_LANGS = {
     'This browser cannot read files. Use the built-in dictionary.': 'Этот браузер не умеет читать файлы. Используйте встроенный словарь.',
     'Could not read the file.': 'Не удалось прочитать файл.',
     'Built-in dictionary (dictionary.js) was not found next to this page.': 'Встроенный словарь (dictionary.js) не найден рядом с этой страницей.',
-    'Ad': 'Реклама',
-    'Click to open. Press and hold to copy the link.': 'Нажмите, чтобы открыть. Удерживайте, чтобы скопировать ссылку.',
-    'Link copied': 'Ссылка скопирована',
-    'Could not copy the link': 'Не удалось скопировать ссылку'
+    'Ad': 'Реклама'
   } },
 
   uk: { name: 'Українська', flag: '🇺🇦', strings: {
@@ -74,10 +71,7 @@ var MWT_LANGS = {
     'This browser cannot read files. Use the built-in dictionary.': 'Цей браузер не вміє читати файли. Скористайтеся вбудованим словником.',
     'Could not read the file.': 'Не вдалося прочитати файл.',
     'Built-in dictionary (dictionary.js) was not found next to this page.': 'Вбудований словник (dictionary.js) не знайдено поруч із цією сторінкою.',
-    'Ad': 'Реклама',
-    'Click to open. Press and hold to copy the link.': 'Натисніть, щоб відкрити. Утримуйте, щоб скопіювати посилання.',
-    'Link copied': 'Посилання скопійовано',
-    'Could not copy the link': 'Не вдалося скопіювати посилання'
+    'Ad': 'Реклама'
   } },
 
   kk: { name: 'Қазақша', flag: '🇰🇿', strings: {
@@ -105,10 +99,7 @@ var MWT_LANGS = {
     'This browser cannot read files. Use the built-in dictionary.': 'Бұл браузер файлдарды оқи алмайды. Кіріктірілген сөздікті пайдаланыңыз.',
     'Could not read the file.': 'Файлды оқу мүмкін болмады.',
     'Built-in dictionary (dictionary.js) was not found next to this page.': 'Кіріктірілген сөздік (dictionary.js) осы беттің қасынан табылмады.',
-    'Ad': 'Жарнама',
-    'Click to open. Press and hold to copy the link.': 'Ашу үшін басыңыз. Сілтемені көшіру үшін басып тұрыңыз.',
-    'Link copied': 'Сілтеме көшірілді',
-    'Could not copy the link': 'Сілтемені көшіру мүмкін болмады'
+    'Ad': 'Жарнама'
   } },
 
   de: { name: 'Deutsch', flag: '🇩🇪', strings: {
@@ -136,10 +127,7 @@ var MWT_LANGS = {
     'This browser cannot read files. Use the built-in dictionary.': 'Dieser Browser kann keine Dateien lesen. Verwende das eingebaute Wörterbuch.',
     'Could not read the file.': 'Die Datei konnte nicht gelesen werden.',
     'Built-in dictionary (dictionary.js) was not found next to this page.': 'Das eingebaute Wörterbuch (dictionary.js) wurde neben dieser Seite nicht gefunden.',
-    'Ad': 'Werbung',
-    'Click to open. Press and hold to copy the link.': 'Zum Öffnen klicken. Zum Kopieren des Links gedrückt halten.',
-    'Link copied': 'Link kopiert',
-    'Could not copy the link': 'Der Link konnte nicht kopiert werden'
+    'Ad': 'Werbung'
   } },
 
   fr: { name: 'Français', flag: '🇫🇷', strings: {
@@ -167,10 +155,7 @@ var MWT_LANGS = {
     'This browser cannot read files. Use the built-in dictionary.': 'Ce navigateur ne peut pas lire les fichiers. Utilisez le dictionnaire intégré.',
     'Could not read the file.': 'Impossible de lire le fichier.',
     'Built-in dictionary (dictionary.js) was not found next to this page.': 'Le dictionnaire intégré (dictionary.js) est introuvable à côté de cette page.',
-    'Ad': 'Publicité',
-    'Click to open. Press and hold to copy the link.': 'Cliquez pour ouvrir. Maintenez appuyé pour copier le lien.',
-    'Link copied': 'Lien copié',
-    'Could not copy the link': 'Impossible de copier le lien'
+    'Ad': 'Publicité'
   } },
 
   es: { name: 'Español', flag: '🇪🇸', strings: {
@@ -198,10 +183,7 @@ var MWT_LANGS = {
     'This browser cannot read files. Use the built-in dictionary.': 'Este navegador no puede leer archivos. Usa el diccionario integrado.',
     'Could not read the file.': 'No se pudo leer el archivo.',
     'Built-in dictionary (dictionary.js) was not found next to this page.': 'No se encontró el diccionario integrado (dictionary.js) junto a esta página.',
-    'Ad': 'Publicidad',
-    'Click to open. Press and hold to copy the link.': 'Haz clic para abrir. Mantén pulsado para copiar el enlace.',
-    'Link copied': 'Enlace copiado',
-    'Could not copy the link': 'No se pudo copiar el enlace'
+    'Ad': 'Publicidad'
   } }
 
 };

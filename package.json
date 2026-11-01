@@ -31,7 +31,7 @@
     "msi": { "artifactName": "MonoWordTest-${version}-win-${arch}.${ext}", "oneClick": false },
     "mac": { "icon": "build/icon.png", "category": "public.app-category.education", "identity": null },
     "linux": {
-      "icon": "build/icon.png",
+      "icon": "build/icons",
       "category": "Education",
       "synopsis": "Translation guessing game",
       "maintainer": "YOUR-NAME <you@example.com>"
