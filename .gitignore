@@ -4,3 +4,4 @@ www/
 android/
 capacitor.config.*
 *.log
+ads.text.js
