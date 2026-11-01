@@ -3,8 +3,12 @@
 # After editing, run:  python3 tools/build_ads.py
 # Remove a line (or comment it out with #) to remove that ad. Replace the SAMPLE lines below with your own.
 banner1.gif | https://rapidgator.net/affiliate/ref/3885551 | Rapidgator.net
-banner2.gif | http://RegionAds.ru/?ref=1493 | RegionAds
+banner2.png | http://RegionAds.ru/?ref=1493 | RegionAds
 banner3.gif | https://www.bestchange.pro/?p=1300520 | BestChange - Мониторинг обменников в интернете
 banner4.gif | https://www.bestchange.ru/?p=1300520 | BestChange - Мониторинг обменников в интернете
 banner5.gif | https://www.bestchange.com/?p=1300520 | E-currency exchanger monitor BestChange
 banner6.gif | https://www.bestchange.com/?p=1300520 | E-currency exchanger monitor BestChange
+banner7.webp | https://www.exitlag.com/refer/10131364 | Exitlag
+banner8.png | https://aeza.net/?ref=614355 | Aeza
+banner9.png | https://aeza.net/?ref=614355 | Aeza
+banner10.png | https://aeza.net/?ref=614355 | Aeza
