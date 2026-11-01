@@ -1,5 +1,8 @@
 # One ad per line:  image file (in this folder) | link opened in the browser | alt text
-# Supported images: .svg .png .jpg .jpeg .gif .webp
+# Use .png (also supported: .jpg .jpeg .gif .webp .svg). Optimize PNGs first (e.g. FileOptimizer):
+# images are stored as base64 inside ads.js, which makes them ~33% bigger.
+# Write  -  instead of an image file for a plain text link (the third column is then the visible text).
+# The OpenWrt package never contains images: every line there becomes a text link, so give every line a meaningful text.
 # After editing, run:  python3 tools/build_ads.py
 # Remove a line (or comment it out with #) to remove that ad. Replace the SAMPLE lines below with your own.
 banner1.gif | https://rapidgator.net/affiliate/ref/3885551 | Rapidgator.net
@@ -12,3 +15,13 @@ banner7.webp | https://www.exitlag.com/refer/10131364 | Exitlag
 banner8.png | https://aeza.net/?ref=614355 | Aeza
 banner9.png | https://aeza.net/?ref=614355 | Aeza
 banner10.png | https://aeza.net/?ref=614355 | Aeza
+- | https://vdsina.ru/?partner=ak2484jerz1w | Хостинг облачных VDS/VPS серверов
+- | https://vdsina.ru/?partner=mdk9sh6by19q  | Хостинг облачных VDS/VPS серверов
+- | https://www.vdsina.com/?partner=n7sjzez8whn6  | Hosting of cloud VDS/VPS servers
+- | https://www.vdsina.com/?partner=q13r6db27t4y  | Hosting of cloud VDS/VPS servers
+- | https://www.bestchange.pro/?p=1300520 | BestChange - Мониторинг обменников в интернете
+- | https://www.bestchange.ru/?p=1300520 | BestChange - Мониторинг обменников в интернете
+- | https://www.bestchange.com/?p=1300520 | E-currency exchanger monitor BestChange
+- | http://RegionAds.ru/?ref=1493 | RegionAds - Качественная реклама на сайтах вашего региона
+- | https://www.exitlag.com/refer/10131364 | Exitlag - Максимум соединения в 2000+ играх
+- | https://aeza.net/?ref=614355 | Создать сервер в 2 клика с aeza.net
