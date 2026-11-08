@@ -10,8 +10,8 @@ VER=${2:?version}
 OUT=${3:?output dir}
 REL=1
 PKG=luci-app-monowordtest
-URL=${MWT_URL:-https://github.com/YOUR-NAME/MonoWordTest}
-MAINT=${MWT_MAINTAINER:-YOUR-NAME <you@example.com>}
+URL=${MWT_URL:-https://github.com/Monoloshka/MonoWordTest}
+MAINT=${MWT_MAINTAINER:-Monoloshka (Dmitriy Yakovenko)}
 DESC="MonoWordTest - translation guessing game (LuCI: Services > MonoWordTest)"
 IPKG_BUILD_URL="https://raw.githubusercontent.com/openwrt/openwrt/v24.10.0/scripts/ipkg-build"
 
@@ -28,9 +28,7 @@ mkdir -p "$STAGE"
 cp -R "$HERE/files/." "$STAGE/"
 WEB=$STAGE/www/luci-static/resources/monowordtest
 mkdir -p "$WEB"
-for f in index.html translations.js dictionary.js; do
-	cp "$ROOT/$f" "$WEB/$f"
-done
+sh "$ROOT/tools/stage_web.sh" "$WEB" --no-xlsx
 # Routers have little flash/RAM: ads are plain text links here, never images.
 if [ -f "$ROOT/ads.text.js" ]; then
 	cp "$ROOT/ads.text.js" "$WEB/ads.js"
@@ -55,7 +53,7 @@ Version: $VER-r$REL
 Depends: luci-base
 Source: $URL
 SourceName: $PKG
-License: MIT
+License: Unlicense
 Section: luci
 Maintainer: $MAINT
 Architecture: all
@@ -79,7 +77,7 @@ apk)
 		--info "version:$VER-r$REL" \
 		--info "description:$DESC" \
 		--info "arch:noarch" \
-		--info "license:MIT" \
+		--info "license:Unlicense" \
 		--info "origin:$PKG" \
 		--info "url:$URL" \
 		--info "maintainer:$MAINT" \
