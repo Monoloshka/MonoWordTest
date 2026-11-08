@@ -2,10 +2,12 @@
   "name": "monowordtest",
   "productName": "MonoWordTest",
   "version": "0.0.1",
-  "description": "Translation guessing game: load word - translation lines and pick the right answer.",
-  "author": { "name": "Dmitriy Yakovenko (Monoloshka), Claude" },
+  "description": "Translation guessing game",
+  "author": {
+    "name": "Monoloshka (Dmitriy Yakovenko)"
+  },
   "homepage": "https://github.com/Monoloshka/MonoWordTest",
-  "license": "MIT",
+  "license": "SEE LICENSE IN LICENSE",
   "main": "desktop/main.js",
   "private": true,
   "scripts": {
@@ -20,26 +22,76 @@
     "appId": "io.github.monowordtest",
     "productName": "MonoWordTest",
     "artifactName": "MonoWordTest-${version}-${os}-${arch}.${ext}",
-    "directories": { "output": "dist", "buildResources": "build" },
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
     "files": [
-      "index.html", "translations.js", "ads.js", "dictionary.js",
-      "desktop/main.js", "build/icon.png"
+      "index.html",
+      "ads.js",
+      "about.js",
+      "sounds.js",
+      "dictionary.js",
+      "sounds/*.mp3",
+      "vendor/**",
+      "desktop/*.js",
+      "build/icon.png"
     ],
     "compression": "maximum",
-    "win": { "icon": "build/icon.png", "target": ["portable"] },
-    "portable": { "artifactName": "MonoWordTest-${version}-win10-11-${arch}-portable.${ext}" },
-    "msi": { "artifactName": "MonoWordTest-${version}-win-${arch}.${ext}", "oneClick": false },
-    "mac": { "icon": "build/icon.png", "category": "public.app-category.education", "identity": null },
+    "win": {
+      "icon": "build/icon.png",
+      "target": [
+        "portable"
+      ]
+    },
+    "portable": {
+      "artifactName": "MonoWordTest-${version}-win10-11-${arch}-portable.${ext}"
+    },
+    "msi": {
+      "artifactName": "MonoWordTest-${version}-win-${arch}.${ext}",
+      "oneClick": false
+    },
+    "mac": {
+      "icon": "build/icon.png",
+      "category": "public.app-category.education",
+      "identity": null
+    },
     "linux": {
       "icon": "build/icons",
       "category": "Education",
       "synopsis": "Translation guessing game",
-      "maintainer": "YOUR-NAME <you@example.com>"
+      "maintainer": "Monoloshka (Dmitriy Yakovenko)",
+      "desktop": {
+        "Comment[ru]": "Игра на угадывание перевода слов",
+        "Comment[uk]": "Гра на вгадування перекладу слів",
+        "Comment[kk]": "Сөздердің аудармасын табу ойыны",
+        "Comment[de]": "Spiel zum Erraten von Wortübersetzungen",
+        "Comment[fr]": "Jeu pour deviner la traduction des mots",
+        "Comment[es]": "Juego para adivinar la traducción de palabras"
+      }
     },
     "flatpak": {
-      "runtime": "org.freedesktop.Platform", "runtimeVersion": "24.08",
+      "runtime": "org.freedesktop.Platform",
+      "runtimeVersion": "24.08",
       "sdk": "org.freedesktop.Sdk",
-      "base": "org.electronjs.Electron2.BaseApp", "baseVersion": "24.08"
-    }
+      "base": "org.electronjs.Electron2.BaseApp",
+      "baseVersion": "24.08",
+      "files": [
+        [
+          "build/locale",
+          "/share/locale"
+        ]
+      ]
+    },
+    "electronLanguages": [
+      "en-US",
+      "en",
+      "ru",
+      "uk",
+      "kk",
+      "de",
+      "fr",
+      "es"
+    ]
   }
 }

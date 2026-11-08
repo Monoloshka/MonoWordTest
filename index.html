@@ -13,39 +13,57 @@
   .hidden { display: none !important; }
   .screen { -webkit-flex: 1; flex: 1; display: -webkit-flex; display: flex; -webkit-flex-direction: column; flex-direction: column; min-height: 0; }
 
-  /* top bar: language + theme */
-  #topbar { display: -webkit-flex; display: flex; -webkit-flex-wrap: wrap; flex-wrap: wrap; -webkit-justify-content: flex-end; justify-content: flex-end; font-size: 14px; }
-  #topbar div { margin: 0 0 6px 14px; }
-  #topbar select { padding: 4px; }
+  /* top bar: language + theme, always ONE row (labels disappear on narrow screens) */
+  #topbar { display: -webkit-flex; display: flex; -webkit-flex-wrap: nowrap; flex-wrap: nowrap; -webkit-justify-content: flex-end; justify-content: flex-end; font-size: 14px; }
+  #topbar > div { display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; min-width: 0; margin: 0 0 6px 10px; }
+  #topbar label { white-space: nowrap; margin-right: 4px; }
+  #topbar select { min-width: 0; max-width: 100%; padding: 4px; text-overflow: ellipsis; }
+  #langImportBtn { margin: 0 0 0 4px; padding: 2px 9px; font-weight: bold; }
 
   /* menu */
   #menu { -webkit-align-items: center; align-items: center; -webkit-justify-content: center; justify-content: center; text-align: center; }
   h1 { margin: 0 0 6px; font-size: 34px; color: #d97757; }
-  .sub { margin: 0 0 22px; color: #6b6a63; max-width: 560px; }
-  .row { margin: 8px 0; }
+  .sub { margin: 0 0 18px; color: #6b6a63; max-width: 560px; }
+  .row, .setting { margin: 8px 0; }
+  .setting { display: -webkit-flex; display: flex; -webkit-flex-wrap: wrap; flex-wrap: wrap; -webkit-justify-content: center; justify-content: center; -webkit-align-items: center; align-items: center; }
+  .setting > * { margin: 2px 6px; }
   .btn, button { display: inline-block; box-sizing: border-box; margin: 4px; font: inherit; line-height: 1.3; cursor: pointer; border: 1px solid #c9c6b8; background: #fff; color: #141413; padding: 10px 18px; border-radius: 6px; }
   .btn:hover, button:hover { background: #f0eee6; }
   .primary { background: #d97757; border-color: #c4623f; color: #fff; }
   .primary:hover { background: #c4623f; }
   .primary[disabled] { background: #e7c3b4; border-color: #e7c3b4; cursor: default; }
-  #file { position: absolute; left: -9999px; }
+  .file-input { position: absolute; left: -9999px; }
   label { margin-right: 6px; }
-  select { font: inherit; padding: 6px; background: #fff; color: #141413; border: 1px solid #c9c6b8; border-radius: 6px; }
-  #fileName, #message { color: #6b6a63; font-size: 14px; word-wrap: break-word; }
+  .chk { cursor: pointer; }
+  select, input[type=number] { font: inherit; padding: 6px; background: #fff; color: #141413; border: 1px solid #c9c6b8; border-radius: 6px; }
+  input[type=number] { width: 4.5em; }
+  #fileName, #message, .hint { color: #6b6a63; font-size: 14px; word-wrap: break-word; max-width: 560px; }
+  .hint { font-size: 12px; margin: 4px 0; }
   #message.error { color: #b3261e; }
+
+  /* about */
+  #about { -webkit-align-items: center; align-items: center; -webkit-justify-content: center; justify-content: center; text-align: center; }
+  #aboutIcon { width: 128px; height: 128px; }
+  #aboutVersion { margin-top: 8px; font-weight: bold; }
+  #aboutAuthor { margin: 4px 0 14px; color: #6b6a63; }
+  #aboutLinks { list-style: none; margin: 0 0 12px; padding: 0; text-align: left; }
+  #aboutLinks li { margin: 8px 0; }
+  #aboutLinks a { color: #c4623f; }
+  .siteIcon { width: 20px; height: 20px; vertical-align: middle; margin-right: 8px; border: 0; }
 
   /* game */
   #board { -webkit-flex: 1; flex: 1; display: -webkit-flex; display: flex; -webkit-flex-direction: row; flex-direction: row; min-height: 0; }
-  #questionBox { -webkit-flex: 1; flex: 1; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; -webkit-justify-content: center; justify-content: center; padding: 16px; }
+  #questionBox { -webkit-flex: 1; flex: 1; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; -webkit-justify-content: center; justify-content: center; padding: 16px; min-width: 0; }
   #question { font-size: 40px; font-weight: bold; text-align: center; word-wrap: break-word; max-width: 100%; }
+  #qImg { max-width: 100%; max-height: 45vh; }
   #answers { -webkit-flex: 1; flex: 1; display: -webkit-flex; display: flex; -webkit-flex-direction: column; flex-direction: column; -webkit-justify-content: center; justify-content: center; overflow-y: auto; padding: 8px; }
   .ans { display: block; width: 100%; margin: 4px 0; padding: 12px 14px; font-size: 20px; text-align: left; word-wrap: break-word; min-height: 48px; }
   .ans.wrong { background: #d9534f; border-color: #b52b27; color: #fff; }
   .ans.right { background: #3c9d4a; border-color: #2b7a37; color: #fff; }
-  #statusbar { display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; -webkit-justify-content: space-between; justify-content: space-between; padding: 8px 4px; }
-  #status { color: #6b6a63; }
+  #statusbar { display: -webkit-flex; display: flex; -webkit-flex-wrap: wrap; flex-wrap: wrap; -webkit-align-items: center; align-items: center; -webkit-justify-content: space-between; justify-content: space-between; padding: 8px 4px; }
+  #status, #scoreText { color: #6b6a63; margin-right: 12px; }
 
-  /* ad banner: menu only, bottom centre, in the page flow (never over the UI) */
+  /* ad: start screen only, bottom centre, in the page flow */
   #adBox { text-align: center; padding: 10px 0 4px; }
   #adLabel { font-size: 11px; color: #8a897f; margin-bottom: 2px; }
   #adLink { display: inline-block; max-width: 100%; -webkit-user-select: none; -moz-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-user-drag: none; -webkit-tap-highlight-color: transparent; }
@@ -53,29 +71,39 @@
   #adImg { max-width: 100%; max-height: 120px; height: auto; border: 0; -webkit-user-drag: none; }
   #adText { color: #c4623f; text-decoration: underline; font-size: 15px; }
 
+  #toast { position: fixed; left: 50%; bottom: 70px; -webkit-transform: translateX(-50%); transform: translateX(-50%); background: #141413; color: #fff; padding: 8px 16px; border-radius: 20px; font-size: 14px; z-index: 20; }
+  #ctxMenu { position: fixed; z-index: 30; background: #fff; border: 1px solid #c9c6b8; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,.25); padding: 2px; }
+  #ctxMenu button { display: block; margin: 0; border: 0; background: transparent; padding: 8px 16px; width: 100%; text-align: left; }
+
   footer { text-align: center; padding-top: 8px; line-height: 0; }
   footer a { display: inline-block; }
   footer svg { border: 0; }
 
   /* dark theme (plain class, no CSS variables, so old engines still work) */
   body.dark { background: #1f1e1d; color: #f0eee6; }
-  body.dark .sub, body.dark #fileName, body.dark #message, body.dark #status { color: #a8a69c; }
+  body.dark .sub, body.dark #fileName, body.dark #message, body.dark .hint, body.dark #status, body.dark #scoreText, body.dark #aboutAuthor { color: #a8a69c; }
   body.dark #message.error { color: #f2766d; }
-  body.dark .btn, body.dark button, body.dark select { background: #2b2a28; color: #f0eee6; border-color: #4a4843; }
+  body.dark .btn, body.dark button, body.dark select, body.dark input[type=number] { background: #2b2a28; color: #f0eee6; border-color: #4a4843; }
   body.dark .btn:hover, body.dark button:hover { background: #3a3835; }
   body.dark .primary { background: #d97757; border-color: #c4623f; color: #fff; }
   body.dark .primary:hover { background: #c4623f; }
   body.dark .primary[disabled] { background: #5a4338; border-color: #5a4338; color: #bbb; }
   body.dark .ans.wrong { background: #d9534f; border-color: #b52b27; color: #fff; }
   body.dark .ans.right { background: #3c9d4a; border-color: #2b7a37; color: #fff; }
-  body.dark #adLabel { color: #8a897f; }
-  body.dark #adText { color: #f0a58a; }
+  body.dark #adText, body.dark #aboutLinks a { color: #f0a58a; }
+  body.dark #toast { background: #f0eee6; color: #141413; }
+  body.dark #ctxMenu { background: #2b2a28; border-color: #4a4843; }
+  body.dark #ctxMenu button:hover { background: #3a3835; }
 
   /* phones / portrait: question on top, answers below */
   @media (max-width: 700px), (orientation: portrait) {
     #board { -webkit-flex-direction: column; flex-direction: column; }
     #question { font-size: 30px; }
     .ans { font-size: 18px; }
+  }
+  @media (max-width: 520px) {
+    #topbar label { display: none; }
+    #topbar > div { margin-left: 6px; }
   }
 </style>
 </head>
@@ -86,6 +114,8 @@
     <div>
       <label for="lang" data-i18n="Language:">Language:</label>
       <select id="lang"><option value="auto" data-i18n="Auto" data-icon="&#127760;">Auto</option></select>
+      <label class="btn" id="langImportBtn" for="langFile" data-i18n-title="Import language files…" title="Import language files…">+</label>
+      <input type="file" id="langFile" class="file-input" multiple accept=".json,application/json">
     </div>
     <div>
       <label for="theme" data-i18n="Theme:">Theme:</label>
@@ -97,25 +127,29 @@
     </div>
   </div>
 
+  <!-- ===== main menu ===== -->
   <div id="menu" class="screen">
     <h1>MonoWordTest</h1>
     <p class="sub" data-i18n="Guess the translation. Load a .txt file where each line is: word - translation">Guess the translation. Load a .txt file where each line is: word - translation</p>
 
     <div class="row">
       <label class="btn" for="file" data-i18n="Browse…">Browse&hellip;</label>
-      <input type="file" id="file" accept=".txt,text/plain">
+      <input type="file" id="file" class="file-input" multiple accept=".txt,.xlsx,.xls,.ods,.png,.jpg,.jpeg,.webp,.gif,.svg,text/plain">
+      <label class="btn" for="folder" id="folderBtn" data-i18n="Folder…">Folder&hellip;</label>
+      <input type="file" id="folder" class="file-input" multiple webkitdirectory>
       <button type="button" id="builtinBtn" data-i18n="Use built-in RU ↔ EN dictionary">Use built-in RU &#8596; EN dictionary</button>
     </div>
+    <div class="hint" data-i18n="Select several files at once: dictionaries (.txt, .xlsx, .xls, .ods) and the pictures they refer to.">Select several files at once: dictionaries (.txt, .xlsx, .xls, .ods) and the pictures they refer to.</div>
     <div class="row" id="fileName">No file selected</div>
 
-    <div class="row">
+    <div class="setting">
       <label for="count" data-i18n="Answer options:">Answer options:</label>
       <select id="count">
         <option>2</option><option>3</option><option selected>4</option><option>5</option>
         <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option>
       </select>
     </div>
-    <div class="row">
+    <div class="setting">
       <label for="dir" data-i18n="Show:">Show:</label>
       <select id="dir">
         <option value="rand" selected data-i18n="Random side">Random side</option>
@@ -123,22 +157,57 @@
         <option value="ba" data-i18n='Right of " - " (guess the left)'>Right of " - " (guess the left)</option>
       </select>
     </div>
-    <div class="row"><button type="button" id="startBtn" class="primary" disabled data-i18n="Start">Start</button></div>
+    <div class="setting">
+      <label for="nextMode" data-i18n="Next question:">Next question:</label>
+      <select id="nextMode">
+        <option value="auto" selected data-i18n="Automatically">Automatically</option>
+        <option value="manual" data-i18n="By button">By button</option>
+      </select>
+      <span id="delayWrap">
+        <label for="delay" data-i18n="Delay, seconds:">Delay, seconds:</label>
+        <input type="number" id="delay" min="1" max="60" step="1" value="5">
+      </span>
+    </div>
+    <div class="setting">
+      <label class="chk"><input type="checkbox" id="scoreOpt"> <span data-i18n="Count correct and wrong answers">Count correct and wrong answers</span></label>
+    </div>
+    <div class="setting" id="soundRow">
+      <label class="chk"><input type="checkbox" id="soundOpt" checked> <span data-i18n="Sound">Sound</span></label>
+    </div>
+
+    <div class="row">
+      <button type="button" id="startBtn" class="primary" disabled data-i18n="Start">Start</button>
+      <button type="button" id="aboutBtn" data-i18n="About">About</button>
+      <button type="button" id="exitBtn" class="hidden" data-i18n="Exit">Exit</button>
+    </div>
     <div class="row" id="message"></div>
   </div>
 
+  <!-- ===== about ===== -->
+  <div id="about" class="screen hidden">
+    <img id="aboutIcon" class="hidden" alt="" draggable="false">
+    <div id="aboutVersion"></div>
+    <div id="aboutAuthor"></div>
+    <ul id="aboutLinks"></ul>
+    <div class="row"><button type="button" id="backBtn" data-i18n="Back">Back</button></div>
+  </div>
+
+  <!-- ===== game ===== -->
   <div id="game" class="screen hidden">
     <div id="board">
-      <div id="questionBox"><div id="question"></div></div>
+      <div id="questionBox"><div id="question"></div><img id="qImg" class="hidden" alt=""></div>
       <div id="answers"></div>
     </div>
     <div id="statusbar">
-      <span id="status"></span>
-      <button type="button" id="closeBtn" data-i18n="Close">Close</button>
+      <span><span id="status"></span><span id="scoreText"></span></span>
+      <span>
+        <button type="button" id="nextBtn" class="primary hidden" data-i18n="Next">Next</button>
+        <button type="button" id="toMenuBtn" data-i18n="To menu">To menu</button>
+      </span>
     </div>
   </div>
 
-  <!-- Embedded ad banner (menu screen only). Content comes from ads.js, baked into the app. -->
+  <!-- Embedded ad (start screen only). Content comes from ads.js, baked into the app. -->
   <div id="adBox" class="hidden">
     <div id="adLabel"></div>
     <a id="adLink" href="#" target="_blank" rel="noopener noreferrer" draggable="false"><img id="adImg" alt="" draggable="false"><span id="adText"></span></a>
@@ -146,30 +215,22 @@
 
   <footer>
     <a href="https://claude.ai/" target="_blank" rel="noopener noreferrer" title="Claude">
-      <svg xmlns="http://www.w3.org/2000/svg" width="88" height="31" viewBox="0 0 88 31" role="img" aria-label="Claude">
-        <rect x="0.5" y="0.5" width="87" height="30" rx="3" fill="#faf9f5" stroke="#d6d3c8"/>
-        <g stroke="#d97757" stroke-width="2.4" stroke-linecap="round">
-          <line x1="16.0" y1="12.3" x2="16.0" y2="4.5"/>
-          <line x1="17.6" y1="12.7" x2="20.0" y2="8.6"/>
-          <line x1="18.8" y1="13.9" x2="25.1" y2="10.2"/>
-          <line x1="19.2" y1="15.5" x2="23.5" y2="15.5"/>
-          <line x1="18.8" y1="17.1" x2="25.5" y2="21.0"/>
-          <line x1="17.6" y1="18.3" x2="20.2" y2="22.9"/>
-          <line x1="16.0" y1="18.7" x2="16.0" y2="25.5"/>
-          <line x1="14.4" y1="18.3" x2="12.3" y2="22.0"/>
-          <line x1="13.2" y1="17.1" x2="6.5" y2="21.0"/>
-          <line x1="12.8" y1="15.5" x2="8.0" y2="15.5"/>
-          <line x1="13.2" y1="13.9" x2="6.9" y2="10.2"/>
-          <line x1="14.4" y1="12.7" x2="12.0" y2="8.6"/>
-        </g>
-        <text x="33" y="21" font-family="Georgia,'Times New Roman',serif" font-size="16" fill="#141413" textLength="50" lengthAdjust="spacingAndGlyphs">Claude</text>
-      </svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="88" height="31" viewBox="0 0 88 31" role="img" aria-label="Claude" xmlns:c2pa="http://c2pa.org/manifest">
+<rect x="0.5" y="0.5" width="87" height="30" rx="3" fill="#faf9f5" stroke="#d6d3c8"/>
+<g transform="translate(5 7.13) scale(0.08125)">
+<path d="M449.89 19.97C451.23 24.25 449.82 30.74 449.42 35.22C448.88 41.24 449.32 47.47 449.32 53.51C449.32 80.51 449.32 107.5 449.32 134.5C449.32 143.72 449.32 152.95 449.32 162.17C449.32 165.94 449 171.18 452.26 173.83C455.87 176.77 460.71 176.52 464.95 177.63C464.95 180.65 464.95 183.66 464.95 186.68C446.32 186.68 427.69 186.68 409.06 186.68C409.06 183.66 409.06 180.65 409.06 177.63C413.91 176.38 421.67 176.69 423.82 170.91C425.23 167.11 424.68 162.47 424.68 158.51C424.68 150.78 424.68 143.04 424.68 135.31C424.68 113.74 424.68 92.17 424.68 70.61C424.68 64.09 424.68 57.58 424.68 51.07C424.68 48.5 425.36 44.82 424.59 42.38C424.05 40.69 412.34 36.01 410.04 34.79C410.04 33.03 410.04 31.27 410.04 29.5C418.63 26.5 427.6 24.56 436.25 21.76C440.38 20.42 445.55 18.43 449.89 19.97ZM832.42 19.84C833.65 22.12 832.41 26.13 832.24 28.69C831.78 35.6 831.89 42.53 831.89 49.44C831.89 77.93 831.89 106.42 831.89 134.9C831.89 142.37 831.89 149.83 831.89 157.29C831.89 160.78 831.24 165.06 833.15 168.16C835.98 172.75 843.72 171.41 848.14 172.39C848.14 175.5 848.14 178.6 848.14 181.7C839.65 183.26 831.11 184.62 822.65 186.37C817.52 187.44 811.76 189.33 806.5 188.76C806.5 182.61 806.5 176.46 806.5 170.31C804.64 171.69 803.22 174.15 801.49 175.81C796.19 180.92 789.53 184.87 782.49 186.95C752.47 195.82 724.11 175.63 721.13 145.08C718.17 114.72 733.31 84.28 764.17 76.27C771.48 74.38 779.38 74.14 786.84 74.91C794.06 75.65 800.18 78.54 806.38 82.08C808.02 80.43 807.01 74.59 807.01 72.23C807.01 65.58 808.25 46.99 806.73 41.71C801.98 39.35 797.23 36.99 792.47 34.63C792.47 32.92 792.47 31.21 792.47 29.5C800.02 27.09 807.74 25.14 815.31 22.77C820.93 21.01 826.37 18.85 832.42 19.84ZM390.14 38.46C390.66 50.46 391.18 62.46 391.69 74.46C388.3 74.46 384.91 74.46 381.52 74.46C378.81 71.09 377.82 65.78 375.76 61.92C371.37 53.67 364.66 46.52 356.27 42.31C350.37 39.36 344.12 38.48 337.65 37.68C332.39 37.03 327.35 37.64 322.12 38.01C287.88 40.45 276.26 76.46 277.46 105.6C278.62 133.73 290.25 163.88 319.32 172.85C326.12 174.95 333.35 175.23 340.42 175.05C347.95 174.86 355.86 173.31 362.57 169.87C371.58 165.24 378.28 157.11 382.74 148.16C384.59 144.45 385.59 139.16 388.26 136.05C391.71 136.05 395.16 136.05 398.61 136.05C397.11 149.23 395.61 162.42 394.11 175.6C383.13 182.62 366.23 185.63 353.46 187.33C310.17 193.09 265.98 180.45 251.21 135.23C248.56 127.08 247.44 118.24 247.27 109.67C246.58 74.86 267.63 40.48 301.27 29.18C316.95 23.92 333.32 22.9 349.78 24.77C363.22 26.31 379.32 29.78 390.14 38.46ZM585.4 171.31C586.96 172.85 587.82 176.28 587.92 178.45C580.2 188.3 561.38 193.11 551.66 183.91C548.67 181.08 545.29 171.87 543.48 170.84C535.35 178.8 526.91 185.06 515.71 187.86C496.92 192.55 477.85 183.42 475.31 163.39C472.64 142.27 488.18 137.09 504.4 131.85C512.56 129.22 520.84 126.94 529 124.32C533.51 122.86 539.01 122.34 543.09 119.85C544.94 110.42 542.47 96.58 534.46 90.39C527.31 84.87 510.98 82.72 506.11 92.45C503.41 97.83 504.57 104.84 505.64 110.51C503.34 112.23 499.85 111.89 497.09 112.25C494.08 112.64 489.55 114.29 486.6 113.44C480.57 111.7 480.78 99.84 482.11 95.37C488.05 75.38 521.3 71.77 538.19 75.7C542.83 76.78 547.42 77.77 551.58 80.2C567.56 89.57 568.08 107.28 568.08 123.92C568.08 132.33 568.08 140.74 568.08 149.15C568.08 159.28 565.78 173.36 580.11 172.25C581.98 172.1 583.62 171.91 585.4 171.31ZM626.5 74.82C627.79 78.76 625.99 90.91 625.9 95.84C625.62 111.83 625.89 127.86 625.89 143.86C625.89 156.25 625.82 168.89 641.15 170.89C649.99 172.04 658.9 168.82 666.26 164.27C668.15 163.1 672.41 161.16 673.21 159C674.31 155.99 673.4 151.13 673.4 147.93C673.4 139.38 673.4 130.84 673.4 122.29C673.4 115.83 675.3 98.87 671.72 93.95C668.36 89.35 661.95 90.48 657.32 88.51C657.32 85.77 657.32 83.03 657.32 80.29C660.35 78.16 666.27 78.35 669.92 77.95C678.53 77 690.28 73.12 698.68 74.68C700.57 79.31 698.22 90.13 698.11 95.46C697.77 111.85 698.11 128.28 698.11 144.67C698.11 150.14 696.42 165.01 700.13 168.92C703.75 172.75 710.12 171.14 714.64 172.54C714.64 175.46 714.64 178.38 714.64 181.3C711.86 182.65 708.2 182.76 705.15 183.3C698.18 184.55 691.29 186.18 684.29 187.26C680.59 187.84 676.72 189.46 672.97 188.62C672.97 182.38 672.97 176.14 672.97 169.9C670.29 170.78 667.76 175.01 665.46 176.89C659.18 182.03 651.98 186.22 643.98 187.94C638.68 189.07 633.47 188.9 628.13 188.3C624.82 187.92 621.53 187.19 618.46 185.87C601.04 178.39 601.04 159.73 601.04 143.45C601.04 134.09 601.04 124.73 601.04 115.37C601.04 109.89 602.44 99.32 599.85 94.63C596.82 89.13 589.5 90.95 584.92 88.51C584.92 85.66 584.92 82.81 584.92 79.97C589.07 78.37 594.06 78.56 598.44 77.84C606.43 76.53 618.65 73.29 626.5 74.82ZM959.93 146.12C959.93 147.07 959.93 148.02 959.93 148.98C959.35 149.48 955.89 160.2 954.84 162.28C950.71 170.45 943.2 177.41 935.29 181.82C929.07 185.3 922.02 187.53 914.93 188.23C879.4 191.76 854.74 167.59 854.18 132.46C853.66 100.14 877.21 74.79 909.74 74.52C927.03 74.37 942.35 83.3 950.19 98.7C952.2 102.64 955.74 108.99 954.91 113.53C929.28 121.55 903.64 129.57 878 137.6C877.95 141.68 880.84 146.37 882.85 149.8C893 167.19 915.55 171.1 933.05 162.91C938.58 160.32 943.64 156.47 947.7 151.9C949.63 149.72 951.01 146.42 953.29 144.7C955.5 145.17 957.72 145.65 959.93 146.12ZM773.9 87.25C757.35 89.86 749.1 104.15 746.77 119.44C743.59 140.27 750.78 167.95 775.44 170.24C779.45 170.62 783.62 170.67 787.61 169.97C792.56 169.11 804.07 164.5 806.72 159.89C807.68 158.22 807.01 154.72 807.01 152.81C807.01 146.98 807.01 141.14 807.01 135.31C807.01 116.49 810.72 89.8 784.81 87.16C781.29 86.8 777.39 86.7 773.9 87.25ZM927.91 110.49C928.36 108.8 927.73 107.48 927.19 105.9C924.55 98.1 918.99 91.03 910.52 89.24C894.57 85.86 880.32 96.91 876.79 111.97C875.84 116.04 874.69 122.37 876.3 126.36C893.5 121.07 910.71 115.78 927.91 110.49ZM543.04 131.24C539.06 130.76 533.82 133.83 529.96 134.95C517.31 138.62 494.89 142.16 501.62 161.08C502.48 163.51 503.47 165.7 505.35 167.55C513.75 175.81 527.37 171.64 536.01 166.29C537.92 165.11 542.03 163.17 543.04 161.11C544.03 159.09 543.33 155.45 543.33 153.22C543.33 147.97 544.53 135.63 543.04 131.24Z" fill="#0A0A08" fill-rule="evenodd" stroke="#0A0A08" stroke-width="0.25" stroke-linejoin="round"/>
+<path d="M56.14 0.07C58.03 0.07 59.93 0.07 61.83 0.07C62.78 1.22 67.63 0.92 69.86 4.41C70.96 6.12 71.32 8.41 72.2 10.25C75.26 16.68 77.94 23.4 80.91 29.97C84.55 38.02 89.37 45.52 93.04 53.57C95.4 58.73 98.47 63.64 100.64 68.86C101.93 71.97 101.98 76.38 104.39 78.75C106.4 74.66 105.46 66.71 105.97 62.06C107.34 49.4 109.04 36.81 110.09 24.06C110.78 15.71 111.66 5.8 121.07 3.01C123.95 5.27 129.03 7.11 129.58 11.61C130.06 15.64 127.93 22.73 127.18 26.86C125.39 36.69 123.79 46.53 122.01 56.36C121.34 60.05 118.03 69.53 119.44 72.76C123.62 71.77 126.57 64.9 129.09 61.73C137.44 51.23 146 41.03 154.94 31.02C159.7 25.69 164.98 20.33 172.78 23.4C174.83 26.52 176.89 29.64 178.94 32.76C178.17 36.07 177.24 39.82 175.84 42.93C174.11 46.79 169.75 50.86 166.96 54.03C161.42 60.31 156.89 67.72 151.9 74.4C149.2 78.02 142.75 86.34 142.05 90.55C144.2 92.25 155.17 88.76 158.09 88.06C165.13 86.37 172.8 84.77 180.02 84.13C191.22 83.12 193.56 78.5 204.64 84.44C206.01 87.58 204.25 92.62 202.05 95.02C196.49 95.54 191.25 98.11 185.79 99.07C178.52 100.35 171.31 101.9 164.05 103.19C160.57 103.8 157.13 105.29 153.62 105.94C150.59 106.51 138.23 108.46 136.78 110.49C142.6 111 148.42 111.52 154.23 112.04C159.12 112.02 164 112.01 168.89 112C173.06 111.87 177.13 113.29 181.3 113.18C184.82 113.08 192.21 112.94 195.49 114.11C196.9 114.61 198.72 116.28 200.04 117.14C202.89 118.98 208.71 125.48 204.61 128.73C203.63 129.51 202.13 129.86 201.02 130.44C199.52 131.24 197.91 132.45 196.33 133.06C192.94 134.37 184.85 131.07 181.29 130.25C170.87 127.84 160.45 125.26 149.96 123.13C146.16 122.35 139.01 118.74 135.4 120.25C135.56 121.98 143.53 128.36 145.21 130.1C148.62 133.66 153.04 136.47 156.34 140.12C161.72 146.07 168.23 151.46 174.2 156.85C179.59 161.72 187.97 166.27 181.7 173.92C177.85 174.86 172.92 169.35 170.09 167.09C163 161.43 155.37 156.43 148.74 150.14C145.69 147.25 139.08 140.39 135.31 139.21C134.1 141.65 138.63 145.87 139.98 147.95C145.85 156.99 151.71 165.96 157.87 174.84C159.52 177.23 161.08 187.26 157.79 188.95C147.75 194.14 145.83 186.21 140.74 180.15C133.66 171.74 126.67 159.98 121.02 150.57C119.3 147.71 115.87 139.33 113.34 137.86C111.91 138.99 111.31 149.45 111.11 152C110.32 162.19 109.46 172.38 108.28 182.52C107.96 185.33 108.27 188.11 107.74 190.86C106.43 197.74 108.54 202.74 100.4 205.27C99.43 205.57 98.62 206.23 97.48 205.99C96.41 205.76 95.73 204.62 94.91 204.01C87.53 198.53 90.93 193.58 91.91 186.18C93.02 177.75 95.92 169.56 97.07 161.2C97.65 156.98 98.05 152.08 99.13 147.93C99.79 145.38 102.48 133.24 101.53 131.51C90.92 143.98 82.23 158.23 71.97 171.05C66.4 178.01 59.89 187.25 51.89 191.14C49.87 190.03 47.84 188.92 45.82 187.81C45.85 186.04 45.88 184.28 45.91 182.52C55.57 167.51 69 152.37 79.93 137.88C82.32 134.71 89.77 128.14 90.14 124.53C86.85 125.2 78.19 131.65 75.05 133.91C64.15 141.74 52.33 148.32 41.28 155.91C36.85 158.95 24.42 164.56 21.83 156.62C21.23 154.82 22.16 152.28 22.04 150.37C35.74 138.89 51.89 130.09 67.66 121.95C69.57 120.96 79.5 115.82 80.44 114.8C81.21 113.95 81.29 112.67 80.91 111.71C79.12 110.52 75.15 111.04 73.05 111.2C67 111.65 60.77 110.64 54.74 110.4C44.55 109.99 34.39 109.51 24.21 109.15C18.25 108.94 11.72 109.43 5.93 107.86C3.07 107.09 2.5 103.09 0.07 102.1C0.07 100.91 0.07 99.71 0.07 98.52C1.87 98.08 3.04 95.86 5.1 95.65C10.65 95.06 16.63 96.6 22.18 96.94C34.37 97.67 46.62 98.07 58.8 99.01C63.62 99.38 78.16 102.49 81.88 100.72C81.36 98.6 79.53 98.06 77.86 96.92C73.5 93.93 69.15 90.95 64.73 88.1C53.44 80.84 40.29 72.81 29.99 64.23C21.73 57.35 15.71 57.54 16.05 44.56C19.99 39.95 19.59 38.99 25.84 38.99C27.2 38.99 28.56 38.67 29.89 39.17C34.13 40.75 37.58 45.14 41.27 47.66C49.72 53.45 57.42 60.39 65.85 66.22C69 68.4 72.21 70.71 75.28 73.02C76.4 73.86 77.85 75.99 79.34 76.16C79.89 76.23 80.32 75.79 80.76 75.49C78.91 70.67 75.72 66.06 73.14 61.62C67.24 51.47 62.11 40.97 55.89 30.99C52.02 24.76 47.14 18.29 47.7 10.4C47.81 8.97 52.49 2.52 53.77 1.48C54.59 0.83 55.56 0.98 56.14 0.07Z" fill="#D1795E" fill-rule="evenodd" stroke="#D1795E" stroke-width="0.25" stroke-linejoin="round"/>
+</g>
+</svg>
     </a>
   </footer>
 </div>
+<div id="toast" class="hidden"></div>
+<div id="ctxMenu" class="hidden"><button type="button" id="ctxCopy" data-i18n="Copy link">Copy link</button></div>
 
-<script src="translations.js" charset="utf-8"></script>
 <script src="ads.js" charset="utf-8"></script>
+<script src="about.js" charset="utf-8"></script>
+<script src="sounds.js" charset="utf-8"></script>
 <!-- Built-in dictionary (defines BUILTIN_DICTIONARY). Optional: the app works without it. -->
 <script src="dictionary.js" charset="utf-8"></script>
 <script>
@@ -178,39 +239,106 @@
   'use strict';
 
   var SEPARATOR = ' - ';      // space-hyphen-space; a bare "-" inside a word is NOT a separator
-  var ROUND_DELAY = 5;        // seconds between rounds
   var MAX_PAIRS = 500000;     // safety cap for huge files
+  var LONG_PRESS_MS = 600;    // hold time on an About link to copy it
+  var DEFAULT_DELAY = 5;      // seconds
 
-  var LANGS = (typeof MWT_LANGS !== 'undefined' && MWT_LANGS) ? MWT_LANGS : { en: { name: 'English', flag: '\uD83C\uDDEC\uD83C\uDDE7', strings: {} } };
   var ADS = (typeof MWT_ADS !== 'undefined' && MWT_ADS && MWT_ADS.length) ? MWT_ADS : [];
+  var ABOUT = (typeof MWT_ABOUT !== 'undefined' && MWT_ABOUT) ? MWT_ABOUT : null;
+  var SOUNDS = (typeof MWT_SOUNDS !== 'undefined' && MWT_SOUNDS) ? MWT_SOUNDS : {};
+
+  var DICT_EXT = { txt: 1, xlsx: 1, xls: 1, ods: 1 };
+  var IMG_EXT = { png: 1, jpg: 1, jpeg: 1, webp: 1, gif: 1, svg: 1 };
 
   var pairs = [];
   var locked = false;
   var tickTimer = null;
   var round = null;
-  var langCode = 'en';
-  var fileState = { key: 'No file selected', raw: null };
+  var score = { ok: 0, bad: 0 };
+  var langId = 'en';
+  var LANGLIST = [], LANGBY = {}, imported = [];
+  var fileState = { key: 'No file selected', params: null, raw: null };
   var msgState = { key: '', params: null, error: false };
   var statusState = { key: '', params: null };
   var currentAd = null, lastAd = -1;
+  var imgByPath = {}, imgByBase = {}, imgEntries = [];
 
   /* ---------- helpers ---------- */
   function $(id) { return document.getElementById(id); }
   function setText(el, t) { if ('textContent' in el) { el.textContent = t; } else { el.innerText = t; } }
   function on(el, ev, fn) { if (el.addEventListener) { el.addEventListener(ev, fn, false); } else if (el.attachEvent) { el.attachEvent('on' + ev, fn); } }
-  function addClass(el, c) { if ((' ' + el.className + ' ').indexOf(' ' + c + ' ') < 0) { el.className += (el.className ? ' ' : '') + c; } }
+  function hasClass(el, c) { return (' ' + el.className + ' ').indexOf(' ' + c + ' ') >= 0; }
+  function addClass(el, c) { if (!hasClass(el, c)) { el.className += (el.className ? ' ' : '') + c; } }
   function delClass(el, c) { el.className = (' ' + el.className + ' ').replace(' ' + c + ' ', ' ').replace(/^\s+|\s+$/g, ''); }
   function randInt(n) { return Math.floor(Math.random() * n); }
   function trim(s) { return s.replace(/^\s+|\s+$/g, ''); }
   function stopEvent(e) { if (e.preventDefault) { e.preventDefault(); } else { e.returnValue = false; } }
   function saveSetting(k, v) { try { window.localStorage.setItem('mwt_' + k, v); } catch (e) { } }
   function loadSetting(k) { try { return window.localStorage.getItem('mwt_' + k); } catch (e) { return null; } }
+  function extOf(name) { var m = /\.([A-Za-z0-9]+)$/.exec(name); return m ? m[1].toLowerCase() : ''; }
 
-  /* ---------- i18n ---------- */
-  function findLang(tag) {
-    for (var k in LANGS) { if (LANGS.hasOwnProperty(k) && k.toLowerCase() === tag) { return k; } }
-    return null;
+  /* running as a real app (Electron / NW.js / Capacitor) and not in a browser tab or on a router page? */
+  function isStandalone() {
+    try {
+      if (window.MWT_STANDALONE) { return true; }
+      if (/Electron\//.test(navigator.userAgent)) { return true; }
+      if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) { return true; }
+    } catch (e) { }
+    return false;
   }
+
+  /* ---------- i18n ----------
+     The app contains only English. More languages come from (1) the gettext catalogues of a Flatpak
+     (MWT_NATIVE_LANGS, supplied by the Electron wrapper) and (2) .json language files the user imports
+     (kept in localStorage). Several entries with the same language code are listed as "Name", "Name (2)", ... */
+  var CODE_RE = /^[A-Za-z]{2,3}([-_][A-Za-z0-9]{2,8})*$/;
+  function cleanLang(code, L) {
+    if (!L || typeof L !== 'object' || !CODE_RE.test(String(code))) { return null; }
+    var strings = {}, n = 0, k;
+    if (L.strings && typeof L.strings === 'object') {
+      for (k in L.strings) {
+        if (L.strings.hasOwnProperty(k) && typeof L.strings[k] === 'string' && L.strings[k] !== '' && k.length < 2000 && L.strings[k].length < 2000 && n < 1000) { strings[k] = L.strings[k]; n++; }
+      }
+    }
+    return { code: String(code).replace('_', '-').toLowerCase(), name: String(L.name || code).substring(0, 80), flag: L.flag ? String(L.flag).substring(0, 16) : '', strings: strings };
+  }
+  function langsFromData(data) {          // {"ru": {...}, "uk": {...}}  or a single {"code": "ru", "name": ..., "strings": ...}
+    var out = [], k, e;
+    if (!data || typeof data !== 'object') { return out; }
+    if (data.strings && typeof data.strings === 'object') { e = cleanLang(data.code, data); if (e) { out.push(e); } return out; }
+    var count = 0;
+    for (k in data) { if (data.hasOwnProperty(k) && count++ < 200) { e = cleanLang(k, data[k]); if (e) { out.push(e); } } }
+    return out;
+  }
+  function rebuildLangList() {
+    var list = [{ code: 'en', name: 'English', flag: '\uD83C\uDDEC\uD83C\uDDE7', strings: {} }], k, i;
+    var nat = window.MWT_NATIVE_LANGS;
+    if (nat && typeof nat === 'object') {
+      for (k in nat) { if (nat.hasOwnProperty(k)) { var ne = cleanLang(k, nat[k]); if (ne) { list.push(ne); } } }
+    }
+    for (i = 0; i < imported.length; i++) { list.push(imported[i]); }
+    var counts = {};
+    LANGBY = {};
+    for (i = 0; i < list.length; i++) {
+      var e = list[i], c = e.code;
+      counts[c] = (counts[c] || 0) + 1;
+      e.id = counts[c] === 1 ? c : c + '#' + counts[c];
+      e.label = (e.flag ? e.flag + ' ' : '') + e.name + (counts[c] > 1 ? ' (' + counts[c] + ')' : '');
+      LANGBY[e.id] = e;
+    }
+    LANGLIST = list;
+  }
+  function loadImported() {
+    imported = [];
+    try {
+      var raw = JSON.parse(loadSetting('langs') || '[]');
+      for (var i = 0; i < raw.length; i++) {
+        var r = raw[i], e = (r && typeof r === 'object') ? cleanLang(r.code, r) : null;
+        if (e) { imported.push(e); }
+      }
+    } catch (err) { imported = []; }
+  }
+  function saveImported() { saveSetting('langs', JSON.stringify(imported)); }
   function detectLang() {
     var list = [];
     try {
@@ -220,18 +348,22 @@
     for (var i = 0; i < list.length; i++) {
       var tag = String(list[i] || '').toLowerCase().replace('_', '-');
       if (!tag) { continue; }
-      var code = findLang(tag) || findLang(tag.split('-')[0]);
-      if (code) { return code; }
+      var id = findLang(tag) || findLang(tag.split('-')[0]);
+      if (id) { return id; }
     }
     return 'en';
   }
-  function currentLangCode() {
+  function findLang(tag) {                  // first entry with that code
+    for (var i = 0; i < LANGLIST.length; i++) { if (LANGLIST[i].code === tag) { return LANGLIST[i].id; } }
+    return null;
+  }
+  function currentLangId() {
     var pref = $('lang').value;
-    if (pref && pref !== 'auto' && LANGS.hasOwnProperty(pref)) { return pref; }
+    if (pref && pref !== 'auto' && pref !== '__remove__' && LANGBY.hasOwnProperty(pref)) { return pref; }
     return detectLang();
   }
   function t(key, params) {
-    var s = key, L = LANGS[langCode];
+    var s = key, L = LANGBY[langId];
     if (L && L.strings && L.strings.hasOwnProperty(key) && L.strings[key]) { s = L.strings[key]; }
     if (params) {
       for (var p in params) { if (params.hasOwnProperty(p)) { s = s.split('{' + p + '}').join(String(params[p])); } }
@@ -239,30 +371,75 @@
     return s;
   }
   function applyLang() {
-    langCode = currentLangCode();
-    document.documentElement.lang = langCode;
-    var els = document.querySelectorAll('[data-i18n]');
-    for (var i = 0; i < els.length; i++) {
+    langId = currentLangId();
+    document.documentElement.lang = LANGBY[langId] ? LANGBY[langId].code : 'en';
+    var els = document.querySelectorAll('[data-i18n]'), i;
+    for (i = 0; i < els.length; i++) {
       var icon = els[i].getAttribute('data-icon');
       setText(els[i], (icon ? icon + ' ' : '') + t(els[i].getAttribute('data-i18n')));
     }
-    renderFile(); renderMessage(); renderStatus(); renderAdText();
+    els = document.querySelectorAll('[data-i18n-title]');
+    for (i = 0; i < els.length; i++) {
+      var tt = t(els[i].getAttribute('data-i18n-title'));
+      els[i].setAttribute('title', tt); els[i].setAttribute('aria-label', tt);
+    }
+    renderFile(); renderMessage(); renderStatus(); renderScore(); renderAdText(); renderAbout();
   }
-  function buildLangMenu() {
+  function buildLangMenu(preferred) {
     var sel = $('lang');
-    for (var k in LANGS) {
-      if (!LANGS.hasOwnProperty(k)) { continue; }
+    while (sel.options.length > 1) { sel.remove(1); }
+    for (var i = 0; i < LANGLIST.length; i++) {
       var o = document.createElement('option');
-      o.value = k;
-      setText(o, (LANGS[k].flag ? LANGS[k].flag + ' ' : '') + (LANGS[k].name || k));
+      o.value = LANGLIST[i].id;
+      setText(o, LANGLIST[i].label);
       sel.appendChild(o);
     }
-    var saved = loadSetting('lang');
-    sel.value = (saved && (saved === 'auto' || LANGS.hasOwnProperty(saved))) ? saved : 'auto';
+    if (imported.length) {
+      var r = document.createElement('option');
+      r.value = '__remove__';
+      r.setAttribute('data-i18n', 'Remove imported languages'); r.setAttribute('data-icon', '\uD83D\uDDD1');
+      sel.appendChild(r);
+    }
+    var saved = preferred || loadSetting('lang');
+    sel.value = (saved && LANGBY.hasOwnProperty(saved)) ? saved : 'auto';
+  }
+  function importLangFiles(files) {
+    var idx = 0, added = [];
+    function next() {
+      if (idx >= files.length) { done(); return; }
+      var f = files[idx++];
+      if (f.size > 2 * 1024 * 1024) { next(); return; }
+      var r = new FileReader();
+      r.onerror = function () { next(); };
+      r.onload = function () {
+        try {
+          var found = langsFromData(JSON.parse(String(r.result).replace(/^\uFEFF/, '')));
+          for (var i = 0; i < found.length; i++) {
+            var sig = JSON.stringify([found[i].code, found[i].name, found[i].strings]), dup = false;
+            for (var j = 0; j < imported.length; j++) { if (JSON.stringify([imported[j].code, imported[j].name, imported[j].strings]) === sig) { dup = true; break; } }
+            if (!dup && imported.length < 300) { imported.push(found[i]); added.push(found[i]); }
+          }
+        } catch (err) { /* not valid JSON: skipped */ }
+        next();
+      };
+      try { r.readAsText(f, 'UTF-8'); } catch (e) { next(); }
+    }
+    function done() {
+      if (!added.length) { showToast('No usable language data in the selected files.'); return; }
+      saveImported();
+      rebuildLangList();
+      var first = added[0].id;                // the first entry added is selected right away
+      saveSetting('lang', first);
+      buildLangMenu(first);
+      applyLang();
+      showToast('Languages added: {n}', { n: added.length });
+    }
+    if (typeof FileReader === 'undefined') { showToast('No usable language data in the selected files.'); return; }
+    next();
   }
 
   /* dynamic texts that must be re-rendered when the language changes */
-  function renderFile() { setText($('fileName'), fileState.raw !== null ? fileState.raw : t(fileState.key)); }
+  function renderFile() { setText($('fileName'), fileState.raw !== null ? fileState.raw : t(fileState.key, fileState.params)); }
   function setMessage(key, params, isError) { msgState = { key: key, params: params || null, error: !!isError }; renderMessage(); }
   function renderMessage() {
     setText($('message'), msgState.key ? t(msgState.key, msgState.params) : '');
@@ -280,8 +457,55 @@
     if (dark) { addClass(document.body, 'dark'); } else { delClass(document.body, 'dark'); }
   }
 
+  /* ---------- toast, clipboard ---------- */
+  var toastTimer = null;
+  function showToast(key, params) {
+    var el = $('toast');
+    setText(el, t(key, params));
+    delClass(el, 'hidden');
+    if (toastTimer) { clearTimeout(toastTimer); }
+    toastTimer = setTimeout(function () { addClass(el, 'hidden'); }, 2000);
+  }
+  function copyText(text, done) {
+    function fallback() {
+      var ok = false;
+      try {
+        var ta = document.createElement('textarea');
+        ta.value = text; ta.style.position = 'fixed'; ta.style.left = '-9999px';
+        document.body.appendChild(ta); ta.focus(); ta.select();
+        ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+      } catch (e) { ok = false; }
+      done(ok);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () { done(true); }, fallback);
+    } else { fallback(); }
+  }
+
+  /* ---------- sound (mp3 only; several events may share one file) ---------- */
+  function playSound(ev) {
+    if (!$('soundOpt').checked || !SOUNDS[ev]) { return; }
+    try {
+      var a = new Audio(SOUNDS[ev]);
+      var p = a.play();
+      if (p && p.catch) { p.catch(function () { }); }
+    } catch (e) { }
+  }
+  function hasSounds() { for (var k in SOUNDS) { if (SOUNDS.hasOwnProperty(k)) { return true; } } return false; }
+
   /* ---------- parsing: never throws, silently skips bad lines ---------- */
-  function parseText(text) {
+  function isImageRef(s) {
+    if (/^https?:\/\//i.test(s)) { return /\.(png|jpe?g|webp|gif|svg)([?#]|$)/i.test(s); }
+    return /\.(png|jpe?g|webp|gif|svg)$/i.test(s);
+  }
+  function makePair(a, b, dir) {
+    if (!a || !b) { return null; }
+    var ai = isImageRef(a), bi = isImageRef(b);
+    if (ai && bi) { return null; }          // a picture on both sides makes no question
+    return { a: a, b: b, ai: ai, bi: bi, dir: dir };
+  }
+  function parseText(text, dir) {
     var out = [];
     try {
       text = String(text).replace(/^\uFEFF/, '');
@@ -290,50 +514,149 @@
         var line = lines[i];
         var p = line.indexOf(SEPARATOR);
         if (p < 0) { continue; }
-        var a = trim(line.substring(0, p));
-        var b = trim(line.substring(p + SEPARATOR.length));
-        if (a === '' || b === '') { continue; }
-        out.push({ a: a, b: b });
+        var pr = makePair(trim(line.substring(0, p)), trim(line.substring(p + SEPARATOR.length)), dir);
+        if (pr) { out.push(pr); }
       }
     } catch (e) { /* ignore: whatever was parsed so far is kept */ }
     return out;
   }
-
-  function loadDictionary(text, label) {
-    var parsed = parseText(text);
-    fileState = label.key ? { key: label.key, raw: null } : { key: '', raw: label.raw };
-    renderFile();
-    if (parsed.length < 2) {
-      pairs = [];
-      $('startBtn').disabled = true;
-      setMessage('No usable lines found. Each line must look like: word - translation (at least 2 lines).', null, true);
-      return;
-    }
-    pairs = parsed;
-    $('startBtn').disabled = false;
-    setMessage('Loaded {n} entries. Choose options and press Start.', { n: pairs.length }, false);
+  function parseWorkbook(wb, dir) {
+    var out = [];
+    try {
+      for (var s = 0; s < wb.SheetNames.length; s++) {
+        var rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[s]], { header: 1, defval: '', raw: false });
+        for (var r = 0; r < rows.length && out.length < MAX_PAIRS; r++) {
+          var row = rows[r] || [];
+          var pr = makePair(trim(String(row[0] == null ? '' : row[0])), trim(String(row[1] == null ? '' : row[1])), dir);
+          if (pr) { out.push(pr); }
+        }
+      }
+    } catch (e) { }
+    return out;
   }
 
-  /* ---------- file reading (UTF-8, falls back to Windows-1251) ---------- */
-  function readFile(file) {
-    if (typeof FileReader === 'undefined') {
-      setMessage('This browser cannot read files. Use the built-in dictionary.', null, true);
-      return;
-    }
+  /* ---------- reading files ---------- */
+  function readTextFile(file, cb) {            // UTF-8, falls back to Windows-1251
     var r = new FileReader();
-    r.onerror = function () { setMessage('Could not read the file.', null, true); };
+    r.onerror = function () { cb(null); };
     r.onload = function () {
       var txt = r.result;
       if (typeof txt === 'string' && txt.indexOf('\uFFFD') >= 0) {
         var r2 = new FileReader();
-        r2.onerror = function () { loadDictionary(txt, { raw: file.name }); };
-        r2.onload = function () { loadDictionary(r2.result, { raw: file.name + ' (Windows-1251)' }); };
-        try { r2.readAsText(file, 'windows-1251'); } catch (e) { loadDictionary(txt, { raw: file.name }); }
-      } else {
-        loadDictionary(txt, { raw: file.name });
-      }
+        r2.onerror = function () { cb(txt); };
+        r2.onload = function () { cb(r2.result); };
+        try { r2.readAsText(file, 'windows-1251'); } catch (e) { cb(txt); }
+      } else { cb(txt); }
     };
-    try { r.readAsText(file, 'UTF-8'); } catch (e) { setMessage('Could not read the file.', null, true); }
+    try { r.readAsText(file, 'UTF-8'); } catch (e) { cb(null); }
+  }
+  function loadXlsxLib(cb) {                    // loaded only when a spreadsheet is chosen
+    if (window.XLSX) { cb(true); return; }
+    var head = document.getElementsByTagName('head')[0], s = document.createElement('script');
+    var embedded = document.getElementById('mwt-xlsx');      // present in the single-file build (MonoWordTest.html)
+    if (embedded) {
+      try { s.text = embedded.text || embedded.textContent; head.appendChild(s); } catch (e) { }
+      cb(!!window.XLSX);
+      return;
+    }
+    s.onload = function () { cb(!!window.XLSX); };
+    s.onerror = function () { cb(false); };
+    s.src = 'vendor/xlsx.full.min.js';
+    head.appendChild(s);
+  }
+  function readSpreadsheet(file, dir, cb) {     // cb(pairs | null, errorKey)
+    loadXlsxLib(function (ok) {
+      if (!ok) { cb(null, 'Spreadsheet support is not available in this build.'); return; }
+      var r = new FileReader();
+      r.onerror = function () { cb(null, 'Could not read the spreadsheet.'); };
+      r.onload = function () {
+        try { cb(parseWorkbook(XLSX.read(r.result, { type: 'array' }), dir), null); }
+        catch (e) { cb(null, 'Could not read the spreadsheet.'); }
+      };
+      try { r.readAsArrayBuffer(file); } catch (e) { cb(null, 'Could not read the spreadsheet.'); }
+    });
+  }
+
+  function dirOf(path) { var i = path.lastIndexOf('/'); return i < 0 ? '' : path.substring(0, i); }
+  function normPath(p) {
+    var parts = p.replace(/\\/g, '/').split('/'), out = [];
+    for (var i = 0; i < parts.length; i++) {
+      if (parts[i] === '' || parts[i] === '.') { continue; }
+      if (parts[i] === '..') { out.pop(); continue; }
+      out.push(parts[i]);
+    }
+    return out.join('/');
+  }
+
+  function resetImages() {
+    for (var i = 0; i < imgEntries.length; i++) {
+      try { if (imgEntries[i].url && window.URL && URL.revokeObjectURL) { URL.revokeObjectURL(imgEntries[i].url); } } catch (e) { }
+    }
+    imgByPath = {}; imgByBase = {}; imgEntries = [];
+  }
+  /* picture reference -> usable URL. Paths are relative to the folder of the dictionary file;
+     if the browser gave no folder information (plain multi-select) the file name alone is matched. */
+  function imageURL(ref, dir) {
+    if (/^https?:\/\//i.test(ref)) { return ref; }
+    var full = normPath((dir ? dir + '/' : '') + ref).toLowerCase();
+    var e = imgByPath[full];
+    if (!e) { e = imgByBase[ref.replace(/\\/g, '/').split('/').pop().toLowerCase()]; }
+    if (!e) { return null; }
+    if (!e.url) {
+      if (!(window.URL && URL.createObjectURL)) { return null; }
+      e.url = URL.createObjectURL(e.file);
+    }
+    return e.url;
+  }
+
+  function handleFiles(list) {
+    var dicts = [], i;
+    resetImages();
+    for (i = 0; i < list.length; i++) {
+      var f = list[i];
+      var path = String(f.webkitRelativePath || f.name).replace(/\\/g, '/');
+      var ext = extOf(f.name);
+      if (DICT_EXT[ext]) { dicts.push({ file: f, path: path, ext: ext }); }
+      else if (IMG_EXT[ext]) {
+        var entry = { file: f, url: null };
+        imgEntries.push(entry);
+        imgByPath[path.toLowerCase()] = entry;
+        var base = f.name.toLowerCase();
+        if (!imgByBase[base]) { imgByBase[base] = entry; }
+      }
+    }
+    if (typeof FileReader === 'undefined') { finishLoading([], null, 'This browser cannot read files. Use the built-in dictionary.', 0); return; }
+    if (!dicts.length) { finishLoading([], null, 'No dictionary file (.txt, .xlsx, .xls, .ods) among the selected files.', 0); return; }
+
+    var all = [], idx = 0, lastError = null;
+    function next() {
+      if (idx >= dicts.length) { finishLoading(all, dicts, lastError, dicts.length); return; }
+      var d = dicts[idx++], dir = dirOf(d.path);
+      function got(prs, err) {
+        if (prs) { for (var k = 0; k < prs.length && all.length < MAX_PAIRS; k++) { all.push(prs[k]); } }
+        if (err) { lastError = err; }
+        next();
+      }
+      if (d.ext === 'txt') { readTextFile(d.file, function (txt) { got(txt === null ? null : parseText(txt, dir), txt === null ? 'Could not read the file.' : null); }); }
+      else { readSpreadsheet(d.file, dir, got); }
+    }
+    next();
+  }
+
+  function finishLoading(all, dicts, errKey, count) {
+    if (all.length < 2) {
+      pairs = [];
+      $('startBtn').disabled = true;
+      fileState = { key: 'No file selected', params: null, raw: null };
+      renderFile();
+      setMessage(errKey || 'No usable lines found. Each line must look like: word - translation (at least 2 lines).', null, true);
+      return;
+    }
+    pairs = all;
+    $('startBtn').disabled = false;
+    fileState = count === 1 ? { key: '', params: null, raw: dicts[0].file.name } : { key: 'Files selected: {n}', params: { n: count }, raw: null };
+    renderFile();
+    setMessage('Loaded {n} entries. Choose options and press Start.', { n: pairs.length }, false);
   }
 
   /* ---------- game ---------- */
@@ -344,60 +667,100 @@
     return arr;
   }
   function stopTimer() { if (tickTimer) { clearInterval(tickTimer); tickTimer = null; } }
+  function delaySeconds() {
+    var n = parseInt($('delay').value, 10);
+    if (isNaN(n) || n < 1) { n = DEFAULT_DELAY; }
+    return n > 60 ? 60 : n;
+  }
+  function renderScore() {
+    var show = $('scoreOpt').checked && !hasClass($('game'), 'hidden');
+    setText($('scoreText'), show ? '\u2714 ' + t('Correct: {n}', { n: score.ok }) + '   \u2716 ' + t('Wrong: {n}', { n: score.bad }) : '');
+  }
+
+  function showPrompt(text, isImg, dir) {
+    var q = $('question'), qi = $('qImg');
+    if (isImg) {
+      var u = imageURL(text, dir);
+      if (u) {
+        qi.onerror = function () { addClass(qi, 'hidden'); setText(q, text); delClass(q, 'hidden'); };
+        qi.src = u;
+        delClass(qi, 'hidden'); addClass(q, 'hidden');
+        return;
+      }
+    }
+    qi.onerror = null;
+    addClass(qi, 'hidden');
+    setText(q, text); delClass(q, 'hidden');
+  }
 
   function newRound() {
     stopTimer();
     locked = false;
+    addClass($('nextBtn'), 'hidden');
     var wanted = parseInt($('count').value, 10) || 4;
     var dir = $('dir').value;
-    var idx = randInt(pairs.length);
+    var idx = randInt(pairs.length), P = pairs[idx];
     var flip = (dir === 'ba') ? true : (dir === 'ab') ? false : (Math.random() < 0.5);
-    var prompt = flip ? pairs[idx].b : pairs[idx].a;
-    var correct = flip ? pairs[idx].a : pairs[idx].b;
+    if (flip ? P.ai : P.bi) { flip = !flip; }       // a picture is always the question, never an answer
+    var prompt = flip ? P.b : P.a;
+    var correct = flip ? P.a : P.b;
+    var promptIsImg = flip ? P.bi : P.ai;
 
     var options = [correct];
     var used = {}; used['$' + correct.toLowerCase()] = true;
     var tries = 0, maxTries = wanted * 60;
     while (options.length < wanted && tries < maxTries) {
       tries++;
-      var k = randInt(pairs.length);
-      var q = flip ? pairs[k].b : pairs[k].a;
-      var c = flip ? pairs[k].a : pairs[k].b;
+      var k = randInt(pairs.length), Q = pairs[k];
+      if (flip ? Q.ai : Q.bi) { continue; }         // answers are always text
+      var q = flip ? Q.b : Q.a;
+      var c = flip ? Q.a : Q.b;
       var key = '$' + c.toLowerCase();
       if (used[key] || q === prompt) { continue; }   // no duplicates, no second "correct" answer
       used[key] = true;
       options.push(c);
     }
     shuffle(options);
-    round = { correct: correct };
+    round = { correct: correct, hadWrong: false };
 
-    setText($('question'), prompt);
+    showPrompt(prompt, promptIsImg, P.dir);
     var box = $('answers');
     box.innerHTML = '';
-    for (var i = 0; i < options.length; i++) { box.appendChild(makeButton(options[i])); }
+    for (var i = 0; i < options.length; i++) { box.appendChild(makeButton(options[i], i)); }
     setStatus('Pick the translation.');
   }
 
-  function makeButton(text) {
+  function makeButton(text, index) {
     var b = document.createElement('button');
     b.type = 'button';
     b.className = 'ans';
-    setText(b, text);
+    setText(b, (index < 9 ? index + 1 : 0) + '. ' + text);     // keys 1-9, the 10th answer is key 0
     on(b, 'click', function () {
-      if (locked || b.className.indexOf('wrong') >= 0) { return; }
+      if (locked || hasClass(b, 'wrong')) { return; }
       if (text === round.correct) {
         addClass(b, 'right');
         locked = true;
-        startCountdown();
+        if (!round.hadWrong) { score.ok++; }
+        renderScore();
+        playSound('correct');
+        afterCorrect();
       } else {
         addClass(b, 'wrong');
+        if (!round.hadWrong) { round.hadWrong = true; score.bad++; renderScore(); }
+        playSound('wrong');
       }
     });
     return b;
   }
 
-  function startCountdown() {
-    var left = ROUND_DELAY;
+  function afterCorrect() {
+    if ($('nextMode').value === 'manual') {
+      setStatus('Correct!');
+      delClass($('nextBtn'), 'hidden');
+      try { $('nextBtn').focus(); } catch (e) { }
+      return;
+    }
+    var left = delaySeconds();
     setStatus('Correct! Next word in {n}...', { n: left });
     tickTimer = setInterval(function () {
       left--;
@@ -406,7 +769,7 @@
     }, 1000);
   }
 
-  /* ---------- ad (menu only; picked at random every time the menu is shown) ----------
+  /* ---------- ad (start screen only; picked at random every time the start screen is shown) ----------
      An entry with image data shows the banner; an entry without it shows a plain text link. */
   function hostOf(url) { var m = /^https?:\/\/([^\/?#]+)/i.exec(url || ''); return m ? m[1] : url; }
   function refreshAd() {
@@ -432,7 +795,7 @@
   function renderAdText() { setText($('adLabel'), t('Ad')); }
   function hideAd() { addClass($('adBox'), 'hidden'); }
 
-  /* The link can be opened, but is not offered for copying: no context menu, no dragging, no selection. */
+  /* The ad link can be opened, but is not offered for copying: no context menu, no dragging, no selection. */
   (function wireAd() {
     var a = $('adLink');
     on(a, 'contextmenu', stopEvent);
@@ -440,51 +803,248 @@
     on(a, 'selectstart', stopEvent);
   })();
 
+  /* ---------- About screen ---------- */
+  function renderAbout() {
+    if (!ABOUT) {                                   // about.js did not load (e.g. only index.html was opened)
+      addClass($('aboutIcon'), 'hidden');
+      setText($('aboutVersion'), t('About data (about.js) was not found next to this page.'));
+      setText($('aboutAuthor'), '');
+      $('aboutLinks').innerHTML = '';
+      return;
+    }
+    var icon = $('aboutIcon');
+    if (ABOUT.icon) { icon.src = ABOUT.icon; delClass(icon, 'hidden'); } else { addClass(icon, 'hidden'); }
+    setText($('aboutVersion'), t('Version {v}', { v: ABOUT.version }));
+    setText($('aboutAuthor'), ABOUT.author || '');
+    var ul = $('aboutLinks');
+    ul.innerHTML = '';
+    var items = ABOUT.links || [];
+    for (var i = 0; i < items.length; i++) {
+      var it = items[i], li = document.createElement('li'), holder = li;
+      if (it.url) {
+        var a = document.createElement('a');
+        a.href = it.url; a.target = '_blank'; a.rel = 'noopener noreferrer';
+        li.appendChild(a); holder = a;
+      }
+      if (it.icon) {
+        var im = document.createElement('img');
+        im.src = it.icon; im.alt = ''; im.className = 'siteIcon'; im.draggable = false;
+        holder.appendChild(im);
+      }
+      holder.appendChild(document.createTextNode(it.text));
+      ul.appendChild(li);
+    }
+  }
+
+  /* About links CAN be copied: long press (touch) copies at once; a mouse context menu offers "Copy link". */
+  var lastCopy = 0, lastTouch = 0, pressTimer = null, pressFired = false, ctxUrl = '';
+  function linkOf(el) { while (el && el.nodeName !== 'A') { el = el.parentNode; } return el; }
+  function copyLink(url) {
+    var now = new Date().getTime();
+    if (now - lastCopy < 1000) { return; }
+    lastCopy = now;
+    copyText(url, function (ok) { showToast(ok ? 'Link copied' : 'Could not copy the link'); });
+  }
+  function cancelPress() { if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; } }
+  function hideCtx() { addClass($('ctxMenu'), 'hidden'); }
+  (function wireAboutLinks() {
+    var ul = $('aboutLinks');
+    on(ul, 'touchstart', function (e) {
+      lastTouch = new Date().getTime();
+      var a = linkOf(e.target || e.srcElement); if (!a) { return; }
+      cancelPress(); pressFired = false;
+      pressTimer = setTimeout(function () { pressTimer = null; pressFired = true; copyLink(a.href); }, LONG_PRESS_MS);
+    });
+    on(ul, 'touchend', cancelPress);
+    on(ul, 'touchmove', cancelPress);
+    on(ul, 'touchcancel', cancelPress);
+    on(ul, 'click', function (e) {
+      if (pressFired) { pressFired = false; stopEvent(e); }      // a long press copies, it does not open
+    });
+    on(ul, 'contextmenu', function (e) {
+      var a = linkOf(e.target || e.srcElement); if (!a) { return; }
+      stopEvent(e);
+      if (new Date().getTime() - lastTouch < 1500) { copyLink(a.href); return; }   // touch long press
+      ctxUrl = a.href;
+      var m = $('ctxMenu');
+      delClass(m, 'hidden');
+      m.style.left = Math.min(e.clientX, Math.max(0, window.innerWidth - 170)) + 'px';
+      m.style.top = Math.min(e.clientY, Math.max(0, window.innerHeight - 50)) + 'px';
+    });
+    on($('ctxCopy'), 'click', function () { hideCtx(); copyLink(ctxUrl); });
+    on(document, 'click', function (e) { if (!linkOf(e.target || e.srcElement) && (e.target || e.srcElement) !== $('ctxCopy')) { hideCtx(); } });
+    on(document, 'keydown', function (e) { if ((e.key || e.keyCode) === 'Escape' || e.keyCode === 27) { hideCtx(); } });
+    on(window, 'scroll', hideCtx);
+  })();
+
   /* ---------- screens ---------- */
-  function showGame() {
-    addClass($('menu'), 'hidden');
-    hideAd();
-    delClass($('game'), 'hidden');
-    newRound();
+  function showScreen(name) {
+    var names = ['menu', 'about', 'game'];
+    for (var i = 0; i < names.length; i++) {
+      if (names[i] === name) { delClass($(names[i]), 'hidden'); } else { addClass($(names[i]), 'hidden'); }
+    }
+    hideCtx();
   }
   function showMenu() {
-    stopTimer();
-    locked = false;
-    addClass($('game'), 'hidden');
-    delClass($('menu'), 'hidden');
-    refreshAd();                                     // new random ad every time the menu appears
+    stopTimer(); locked = false;
+    showScreen('menu');
+    refreshAd();                                     // new random ad every time the start screen appears
+    renderScore();
   }
-  function closeApp() {
+  function showAbout() { stopTimer(); showScreen('about'); hideAd(); renderAbout(); }
+  function showGame() {
+    score = { ok: 0, bad: 0 };
+    showScreen('game'); hideAd();
+    renderScore();
+    newRound();
+  }
+  function doExit() {
+    try {
+      var C = window.Capacitor;
+      if (C && C.Plugins && C.Plugins.App && C.Plugins.App.exitApp) { C.Plugins.App.exitApp(); return; }
+    } catch (e) { }
+    try { window.close(); } catch (e2) { }
+  }
+  function exitApp() {
     stopTimer();
-    try { window.close(); } catch (e) { /* not allowed in a plain browser tab */ }
-    showMenu();   // if the window did not close, go back to the start screen
+    var wait = ($('soundOpt').checked && SOUNDS.exit) ? 350 : 0;   // let the exit sound play
+    playSound('exit');
+    setTimeout(doExit, wait);
   }
 
   /* ---------- wiring ---------- */
-  on($('file'), 'change', function () {
-    var f = $('file').files && $('file').files[0];
-    if (f) { readFile(f); }
-  });
+  function pickedFiles(input) {
+    var l = input.files;
+    if (l && l.length) { handleFiles(l); }
+    try { input.value = ''; } catch (e) { }          // allows choosing the same files again
+  }
+  on($('file'), 'change', function () { pickedFiles($('file')); });
+  on($('folder'), 'change', function () { pickedFiles($('folder')); });
   on($('builtinBtn'), 'click', function () {
+    playSound('builtin');
     if (typeof BUILTIN_DICTIONARY === 'string') {
-      loadDictionary(BUILTIN_DICTIONARY, { key: 'Built-in RU ↔ EN dictionary' });
+      resetImages();
+      var parsed = parseText(BUILTIN_DICTIONARY, '');
+      pairs = parsed;
+      $('startBtn').disabled = parsed.length < 2;
+      fileState = { key: 'Built-in RU ↔ EN dictionary', params: null, raw: null };
+      renderFile();
+      setMessage('Loaded {n} entries. Choose options and press Start.', { n: parsed.length }, false);
     } else {
       setMessage('Built-in dictionary (dictionary.js) was not found next to this page.', null, true);
     }
   });
-  on($('startBtn'), 'click', function () { if (pairs.length > 1) { showGame(); } });
-  on($('closeBtn'), 'click', closeApp);
-  on($('lang'), 'change', function () { saveSetting('lang', $('lang').value); applyLang(); });
+  on($('startBtn'), 'click', function () { if (pairs.length > 1) { playSound('start'); showGame(); } });
+  on($('aboutBtn'), 'click', showAbout);
+  on($('backBtn'), 'click', showMenu);
+  on($('exitBtn'), 'click', exitApp);
+  on($('toMenuBtn'), 'click', function () { playSound('menu'); showMenu(); });
+  on($('nextBtn'), 'click', function () { if (locked) { newRound(); } });
+  on($('lang'), 'change', function () {
+    if ($('lang').value === '__remove__') {
+      imported = []; saveImported(); saveSetting('lang', 'auto');
+      rebuildLangList(); buildLangMenu('auto'); applyLang();
+      showToast('Imported languages removed.');
+      return;
+    }
+    saveSetting('lang', $('lang').value); applyLang();
+  });
+  on($('langFile'), 'change', function () {
+    var l = $('langFile').files;
+    if (l && l.length) { importLangFiles(l); }
+    try { $('langFile').value = ''; } catch (e) { }
+  });
   on($('theme'), 'change', function () { saveSetting('theme', $('theme').value); applyTheme(); });
+  on($('scoreOpt'), 'change', function () { saveSetting('score', $('scoreOpt').checked ? '1' : '0'); renderScore(); });
+  on($('soundOpt'), 'change', function () { saveSetting('sound', $('soundOpt').checked ? '1' : '0'); });
+  on($('count'), 'change', function () { saveSetting('count', $('count').value); });
+  on($('dir'), 'change', function () { saveSetting('dir', $('dir').value); });
+  function syncNextMode() { if ($('nextMode').value === 'manual') { addClass($('delayWrap'), 'hidden'); } else { delClass($('delayWrap'), 'hidden'); } }
+  on($('nextMode'), 'change', function () { saveSetting('nextMode', $('nextMode').value); syncNextMode(); });
+  on($('delay'), 'change', function () { $('delay').value = delaySeconds(); saveSetting('delay', $('delay').value); });
   if (mq) {
     if (mq.addEventListener) { mq.addEventListener('change', applyTheme); }
     else if (mq.addListener) { mq.addListener(applyTheme); }
   }
 
+  /* Coming back to the app (Android: minimised -> opened again; also a browser tab becoming visible)
+     rolls a new random ad, but only while the start screen is showing. */
+  var wasHidden = false, lastResume = 0;
+  function onResume() {
+    var now = new Date().getTime();
+    if (now - lastResume < 500) { return; }
+    lastResume = now;
+    if (!hasClass($('menu'), 'hidden')) { refreshAd(); }
+  }
+  on(document, 'visibilitychange', function () {
+    if (document.visibilityState === 'hidden') { wasHidden = true; }
+    else if (wasHidden) { wasHidden = false; onResume(); }
+  });
+  on(document, 'resume', onResume);                  // Capacitor/Cordova style resume event
+
+  /* ---------- keyboard ----------
+     Digits 1-9 / 0 pick an answer. Arrow keys move focus like Tab, but a closed <select> keeps its own
+     arrow behaviour (they change the value) until the first/last option is reached; then focus moves on. */
+  var FOCUSABLE = 'button, select, input[type=checkbox], input[type=number], label.btn, a[href]';
+  function moveFocus(from, dir) {
+    var all = document.querySelectorAll(FOCUSABLE), list = [], cur = -1;
+    for (var i = 0; i < all.length; i++) {
+      var x = all[i];
+      if (!(x.offsetWidth || x.offsetHeight) || x.disabled) { continue; }
+      if (x === from) { cur = list.length; }
+      list.push(x);
+    }
+    if (!list.length) { return false; }
+    var n = cur < 0 ? (dir > 0 ? 0 : list.length - 1) : cur + dir;
+    if (n < 0 || n >= list.length) { return false; }
+    list[n].focus();
+    return true;
+  }
+  on(document, 'keydown', function (e) {
+    if (e.ctrlKey || e.altKey || e.metaKey) { return; }          // never hijack browser/app shortcuts
+    var key = e.key || '', el = e.target || e.srcElement, tag = (el && el.nodeName) || '';
+    if (/^[0-9]$/.test(key) && !hasClass($('game'), 'hidden') && tag !== 'INPUT' && tag !== 'TEXTAREA' && tag !== 'SELECT') {
+      var btns = $('answers').getElementsByTagName('button'), i = key === '0' ? 9 : parseInt(key, 10) - 1;
+      if (btns[i]) { stopEvent(e); btns[i].click(); }
+      return;
+    }
+    if ((key === 'Enter' || key === ' ') && tag === 'LABEL' && el.getAttribute('for') && $(el.getAttribute('for'))) {
+      stopEvent(e); $(el.getAttribute('for')).click(); return;    // keyboard use of the Browse / Folder buttons
+    }
+    if (e.shiftKey) { return; }
+    var dir = (key === 'ArrowDown' || key === 'ArrowRight' || key === 'Down' || key === 'Right') ? 1 :
+              (key === 'ArrowUp' || key === 'ArrowLeft' || key === 'Up' || key === 'Left') ? -1 : 0;
+    if (!dir || tag === 'TEXTAREA' || (tag === 'INPUT' && el.type === 'number')) { return; }
+    if (tag === 'SELECT') {
+      var atEdge = dir > 0 ? el.selectedIndex >= el.options.length - 1 : el.selectedIndex <= 0;
+      if (!atEdge) { return; }                                  // let the list scroll through its values
+    }
+    if (moveFocus(el, dir)) { stopEvent(e); }
+  });
+
   /* ---------- init ---------- */
+  function initSettings() {
+    var v;
+    if ((v = loadSetting('count'))) { $('count').value = v; }
+    if ((v = loadSetting('dir'))) { $('dir').value = v; }
+    if ((v = loadSetting('nextMode'))) { $('nextMode').value = v; }
+    if ((v = loadSetting('delay'))) { $('delay').value = v; }
+    $('scoreOpt').checked = loadSetting('score') === '1';
+    if (loadSetting('sound') === '0') { $('soundOpt').checked = false; }
+    syncNextMode();
+    if (!hasSounds()) { addClass($('soundRow'), 'hidden'); }
+    if (isStandalone()) { delClass($('exitBtn'), 'hidden'); }
+    var lbls = document.querySelectorAll('label.btn');
+    for (var li = 0; li < lbls.length; li++) { lbls[li].setAttribute('tabindex', '0'); }
+    var probe = document.createElement('input');
+    if (!('webkitdirectory' in probe)) { addClass($('folderBtn'), 'hidden'); }
+  }
+  loadImported();
+  rebuildLangList();
   buildLangMenu();
   var savedTheme = loadSetting('theme');
   $('theme').value = (savedTheme === 'light' || savedTheme === 'dark') ? savedTheme : 'auto';
+  initSettings();
   applyTheme();
   applyLang();
   refreshAd();

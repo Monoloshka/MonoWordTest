@@ -41,25 +41,25 @@ glaze (глэйз) - глазурь
 кипящий - boiling (бойлын), ebullient
 тем паче - all the more
 осанистый - dignified stately
-осуждать - censure, condemn
+осуждать - censure, condemn (сэншу кэндан)
 кадило - cencer
 чернота - blackness
 распекать - dress down scold call down blow up
 юношество - youth
 колкость - sarcasm gibe
-посланник - envoy, messenger
+посланник - envoy, messenger (энвой мэсэнджэ)
 выкидыш - miscarriage abortion
-примирение - reconciliation
+примирение - reconciliation (ракэнсилиэйшэн)
 порицание - animadversion, reprehension
 агрикультура - agriculture
-узкое место - bottleneck, weak point
+узкое место - bottleneck, weak point (ботлнэк вик поинт)
 одышка - short wind
-куча - pile
+куча - pile (пайл )
 стекаться - join, flock gather
 расшивать - embroider, undo rip
-усвоение - adoption, acquirement assimilation, mastering learning
+усвоение - adoption, acquirement assimilation, mastering learning (эдопшэн экваймэнт)
 филантропический - philanthropic, philanthropical
-ботфорты - jackboots
+ботфорты - jackboots (джакбютс)
 лучший - better, best
 казалось бы - one would think
 выхватывать - snatch away from out, snap up off
@@ -78,23 +78,23 @@ glaze (глэйз) - глазурь
 надо - over above, at, about, with
 береговичок - winkle
 прославить - glorify make famous
-слышать - hear, heard
+слышать - hear, heard (хиэ хэд)
 по-видимому - apparently
 целительный - salutary curative
-дрова - wood
+дрова - wood (вэт)
 буфет - sideboard, bar lunchroom refreshment room
 сутулость - slouch, stoop
 прояснить - clarify
 преломить - refract
 скобяной - hard
 состоять - consist, be, occupy  work
-приезжать - arrive
+приезжать - arrive (эрайв)
 неисполнение - nonfulfillment
 восставший - insurgent, revolted
 маскировка - mask, disguise camouflage
 необъяснимый - inexplicable
 произнести - pronounce, deliver make, utter
-тигрица - tigress
+тигрица - tigress (тайгрэс)
 освобожденный - freed, released
 банкрот - bankrupt
 шлепнуть - slap, shuffle, plump
@@ -132,7 +132,7 @@ glaze (глэйз) - глазурь
 переплет - binding book cover
 вечером - in the evening
 осмотрительность - circumspection prudence
-пролив - strait
+пролив - strait (стрэйт)
 голландка - Dutchwoman
 отдыхать - rest relax
 восхититься - be delighted  admire
@@ -197,7 +197,7 @@ glaze (глэйз) - глазурь
 напоминающий - reminiscent
 хищный - rapacious predatory, of prey
 утихать - subside abate, cease, calm down
-резьба - carving
+резьба - carving (кавын)
 запнуться - stumble  falter, pause hesitate
 росистый - dewy
 инфляционный - inflationary
@@ -219,13 +219,13 @@ glaze (глэйз) - глазурь
 аккордный - аккордная работа piecework
 неустойка - forfeit
 разьяснить - explain elucidate
-успешный - successful
+успешный - successful (сыксфэсфул)
 впадение - flowing into, mouth confluence
 что есть мочи - with all one's might
 одновалентный - monovalent, univalent
-обсуждение - discussion
-паковать - pack
-преклоняться - bow, admire
+обсуждение - discussion (дискашэн)
+паковать - pack (пэк)
+преклоняться - bow, admire (бай эдмая)
 сонная тетеря - sleepyhead
 колоть глаза - be a thorn in one's side
 вверх дном - upside down
@@ -465,7 +465,7 @@ glaze (глэйз) - глазурь
 подобострастный - servile
 скунс - skunk
 поцелуй - kiss
-капюшон - hood
+капюшон - hood (Ход)
 родословная - family tree
 зябкий - chilly
 доверие - confidence trust
@@ -496,7 +496,7 @@ glaze (глэйз) - глазурь
 пикантный - piquant spicy
 легковерный - credulous, gullible
 великолепный - magnificent splendid
-дыра - hole
+дыра, нора - hole (хол)
 безденежье - want of money
 сетчатый - cancellated, reticulate, reticulated
 омут - whirlpool vortex, deep
@@ -534,7 +534,7 @@ glaze (глэйз) - глазурь
 выпалывать - weed
 душеприказчица - executrix
 прикладной - applied
-сверло - drill
+сверло - drill (твэл)
 согревать - warm heat
 опекунша - guardian, trustee
 тура - rook castle
@@ -549,9 +549,9 @@ glaze (глэйз) - глазурь
 употреблять - use employ, take, make, употребить во зло abuse
 благодетельный - beneficent, beneficial
 впадина - cavity socket
-многие - many
+многие - many (мэни)
 соединенный - amalgamated, conjoint, conjunct, incorporate
-логичный - logical
+логичный - logical (лоджикал)
 назло - to spite
 хорватка - Croat
 израильский - israeli, israelite
@@ -559,7 +559,7 @@ glaze (глэйз) - глазурь
 красильщик - dyer
 холестерин - cholesterin, cholesterol
 остролист - holly
-товарообмен - barter
+товарообмен - barter (бацэ)
 рыжевато-коричневый - tawny
 заточать - confine imprison, exile
 британская империя - British Empire
@@ -592,7 +592,7 @@ glaze (глэйз) - глазурь
 величина - size, quantity, celebrity
 безделушка - trifle, nick-nack
 бесстыдство - impudence insolence
-оборона - defense
+оборона - defense (Дифэнс)
 укрытие - cover shelter
 припекать - burn be hot
 почтительный - respectful, respectable
@@ -679,12 +679,12 @@ glaze (глэйз) - глазурь
 авторский - author's
 коряга - snag
 секция - section
-сопли - snot
+сопли - snot (снот)
 разыграть - play, raffle
 жиреть - grow fat
 источать - draw, shed, exhale emit
 прошлое - antecedents
-антураж - entourage
+антураж - entourage (антюраж)
 большевизм - Bolshevism
 в придачу - to boot
 благоговение - awe  reverence respect
@@ -694,14 +694,14 @@ glaze (глэйз) - глазурь
 анализировать - analyze
 комик - comedian comic
 пошабашить - knock off
-нерв - nerve
+нерв - nerve (Нэф)
 колокольня - bell tower belfry
 иконоборство - iconoclast
 замерзнуть - freeze congeal, be frozen
 алеть - blush grow crimson, glow
 ребячество - childishness
 каскад - cascade
-лист - leaf
+лист - leaf (лиф)
 полковник - colonel
 улучать - find
 по-прежнему - as before
@@ -795,12 +795,12 @@ glaze (глэйз) - глазурь
 документ - document
 проработать - study
 загс - , registrar's office
-уксус - vinegar
+уксус - vinegar (Веника)
 примочка - lotion
 умножение - multiplication
 приветствовать - greet salute, welcome
 непреложный - inviolable invariable, incontestable
-гробовщик - mortician
+гробовщик - mortician (мутишин)
 освященный - consecrate
 чокнуться - touch
 алтарь - altar
@@ -958,7 +958,7 @@ glaze (глэйз) - глазурь
 блуд - licentiousness
 прохлаждаться - dally
 описание - description
-плач - weeping
+плач - weeping (выкэнь)
 миловать - pardon, spare
 равнозначный - equivalent
 кочегар - fireman stoker
@@ -974,7 +974,7 @@ glaze (глэйз) - глазурь
 надвигаться - impend
 язвительный - venomous, caustic
 октябрь - October
-дождевик - raincoat
+дождевик - raincoat (рэйнкэуть)
 катить - roll drive wheel
 семейство - family
 блевать - spue
@@ -997,11 +997,11 @@ glaze (глэйз) - глазурь
 вверх ногами - upside down
 шумиха - sensation clamor
 папирус - papyrus
-морг - morgue
+морг - morgue (моог)
 бытовой - of manners popular genre, common everyday
 трястись - shake, shiver
 каир - Cairo
-желе - jelly
+желе - jelly (джели)
 эволюционный - evolution
 многогранник - polyhedron
 юрий - George
@@ -1013,7 +1013,7 @@ glaze (глэйз) - глазурь
 мужичий - peasant's rustic
 сплутовать - trick cheat
 эстетический - aesthetic
-ошейник - collar
+ошейник - collar (кэла)
 податель - bearer, petitioner
 выделенительный - excretory
 о - about of, on, with, against on, by in
@@ -1029,7 +1029,7 @@ glaze (глэйз) - глазурь
 неумело - bungle
 строение - construction building, structure
 латук - lettuce
-рот - mouth
+рот - mouth (мауф)
 разжигать - kindle, heat, rouse, unleash
 открытка - post card
 прореха - slit hole tear
@@ -1095,7 +1095,7 @@ glaze (глэйз) - глазурь
 бейсбол - baseball
 затронуть - touch, affect, hurt
 затвердеть - harden
-своровать - steal
+своровать - steal (стил)
 реактивный - reactive, jet
 поручиться - warrant guarantee vouch for
 бунт - revolt mutiny insurrection uprising, bale pack
@@ -1113,7 +1113,7 @@ glaze (глэйз) - глазурь
 неразборчивый - illegible, unscrupulous
 европейский - European
 принцесса - princess
-мудрец - sage
+мудрец - sage (сэйдж)
 времяисчисление - chronology
 лемех - plowshare
 шуршать - rustle
@@ -1230,7 +1230,7 @@ glaze (глэйз) - глазурь
 пуховка - powder puff
 филигрань - filigree
 препровождать - forward send, spend pass
-бирка - tally
+бирка - tally (тяли)
 курительный - smoking
 оборудованный - equipped
 сдерживание - coercion
@@ -1357,7 +1357,7 @@ glaze (глэйз) - глазурь
 библиофил - bibliophile
 переписывание - transcription
 вымазывать - smear, soil
-прыщ - pimple
+прыщ - pimple (пимпл)
 физкультурница - sportsman gymnast
 проскрипеть - creak, scratch, grit gnash
 в целости - intact
@@ -17849,7 +17849,7 @@ glaze (глэйз) - глазурь
 отвиснуть - hang down lop
 скрещивать - cross
 проходить красной нитью - stand out
-молодость - youth adolescence
+молодость - youth (юс)
 гравировать - engrave, etch
 катя - Kitty Kate
 номинальный - nominal
