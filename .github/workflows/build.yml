@@ -20,12 +20,30 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
+      - name: Check about.js matches package.json version
+        run: python3 tools/build_about.py --check
+      - name: Check language files are valid JSON
+        run: python3 -c "import glob,json;[json.load(open(f,encoding='utf-8-sig')) for f in glob.glob('languages/*.json')];print('language files ok')"
+      - name: Check dictionary.js matches dictionary.txt
+        run: python3 tools/build_dictionary.py --check
+      - name: Check the one-file build is up to date
+        run: python3 tools/build_single.py --check
       - name: Zip
         run: |
           VER=$(node -p "require('./package.json').version")
-          mkdir out && zip -q "out/MonoWordTest-${VER}-web.zip" index.html translations.js ads.js dictionary.js dictionary.txt claude-badge.svg README.md
+          sh tools/stage_web.sh stage
+          cp dictionary.txt claude.svg README.md stage/
+          cp -r languages stage/languages
+          mkdir out && (cd stage && zip -qr "../out/MonoWordTest-${VER}-web.zip" .)
+          zip -qr "out/MonoWordTest-${VER}-languages.zip" languages
+          cp MonoWordTest.html "out/MonoWordTest-${VER}.html"
       - uses: actions/upload-artifact@v7
-        with: { name: MonoWordTest-web, path: out/*.zip }
+        with:
+          retention-days: 3
+          name: MonoWordTest-web
+          path: |
+            out/*.zip
+            out/*.html
 
   # ---------------------------------------------------------------- Windows 10/11 (+ Wine/Proton)
   win-modern:
@@ -44,7 +62,7 @@ jobs:
       - run: npx electron-builder --win portable --${{ matrix.arch }} --publish never
         shell: bash
       - uses: actions/upload-artifact@v7
-        with: { name: 'MonoWordTest-win10-11-${{ matrix.arch }}', path: 'dist/MonoWordTest-*.exe' }
+        with: { retention-days: 3, name: 'MonoWordTest-win10-11-${{ matrix.arch }}', path: 'dist/MonoWordTest-*.exe' }
 
   # ---------------------------------------------------------------- Windows 7 / 8 / 8.1 (+ Wine/Proton)
   win-legacy:
@@ -63,7 +81,7 @@ jobs:
             -c.electronVersion=22.3.27 \
             '-c.portable.artifactName=MonoWordTest-${version}-win7-8-8.1-${arch}-portable.${ext}'
       - uses: actions/upload-artifact@v7
-        with: { name: MonoWordTest-win7-8-8.1, path: 'dist/MonoWordTest-*.exe' }
+        with: { retention-days: 3, name: MonoWordTest-win7-8-8.1, path: 'dist/MonoWordTest-*.exe' }
 
   # ---------------------------------------------------------------- Windows installer-style package
   win-msi:
@@ -79,7 +97,7 @@ jobs:
           npm install --no-audit --no-fund
           npx electron-builder --win msi --x64 --publish never
       - uses: actions/upload-artifact@v7
-        with: { name: MonoWordTest-win-msi, path: 'dist/MonoWordTest-*.msi' }
+        with: { retention-days: 3, name: MonoWordTest-win-msi, path: 'dist/MonoWordTest-*.msi' }
 
   # ---------------------------------------------------------------- Windows XP / Vista (experimental)
   win-xp:
@@ -96,7 +114,8 @@ jobs:
           curl -fsSL -o nw.zip "https://dl.nwjs.io/v0.14.7/${NW}.zip"
           unzip -q nw.zip
           mkdir -p "$NW/package.nw"
-          cp index.html translations.js ads.js dictionary.js desktop/nw-bridge.js "$NW/package.nw/"
+          sh tools/stage_web.sh "$NW/package.nw"
+          cp desktop/nw-bridge.js "$NW/package.nw/"
           cp build/icon.png "$NW/package.nw/icon.png"
           cat > "$NW/package.nw/package.json" <<'EOF'
           {"name":"monowordtest","main":"index.html","inject-js-start":"nw-bridge.js","window":{"title":"MonoWordTest","width":960,"height":680,"min_width":360,"min_height":480,"icon":"icon.png"}}
@@ -106,7 +125,7 @@ jobs:
           mkdir out
           zip -qr "out/MonoWordTest-${VER}-winxp-vista-ia32.zip" MonoWordTest-winxp-vista
       - uses: actions/upload-artifact@v7
-        with: { name: MonoWordTest-winxp-vista, path: out/*.zip }
+        with: { retention-days: 3, name: MonoWordTest-winxp-vista, path: out/*.zip }
 
   # ---------------------------------------------------------------- macOS
   macos:
@@ -128,7 +147,7 @@ jobs:
         continue-on-error: true
         run: npx electron-builder --mac pkg --arm64 --publish never
       - uses: actions/upload-artifact@v7
-        with: { name: MonoWordTest-macos, path: 'dist/MonoWordTest-*.*' }
+        with: { retention-days: 3, name: MonoWordTest-macos, path: 'dist/MonoWordTest-*.*' }
 
   # ---------------------------------------------------------------- Linux
   linux:
@@ -154,7 +173,7 @@ jobs:
           npx electron-builder --linux rpm --${{ matrix.arch }} --publish never || \
           npx electron-builder --linux rpm --${{ matrix.arch }} --publish never -c.rpm.compression=gzip
       - uses: actions/upload-artifact@v7
-        with: { name: 'MonoWordTest-linux-${{ matrix.arch }}', path: 'dist/MonoWordTest-*' }
+        with: { retention-days: 3, name: 'MonoWordTest-linux-${{ matrix.arch }}', path: 'dist/MonoWordTest-*' }
 
   linux-snap:
     name: Linux .snap (experimental)
@@ -170,7 +189,7 @@ jobs:
       - run: npm install --no-audit --no-fund
       - run: npx electron-builder --linux snap --x64 --publish never
       - uses: actions/upload-artifact@v7
-        with: { name: MonoWordTest-linux-snap, path: 'dist/*.snap' }
+        with: { retention-days: 3, name: MonoWordTest-linux-snap, path: 'dist/*.snap' }
 
   linux-flatpak:
     name: Linux .flatpak (experimental)
@@ -187,9 +206,11 @@ jobs:
           flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
           flatpak install --user -y flathub org.freedesktop.Platform//24.08 org.freedesktop.Sdk//24.08 org.electronjs.Electron2.BaseApp//24.08
       - run: npm install --no-audit --no-fund
+      - name: gettext catalogues for /app/share/locale
+        run: python3 tools/make_po.py
       - run: npx electron-builder --linux flatpak --x64 --publish never
       - uses: actions/upload-artifact@v7
-        with: { name: MonoWordTest-linux-flatpak, path: 'dist/*.flatpak' }
+        with: { retention-days: 3, name: MonoWordTest-linux-flatpak, path: 'dist/*.flatpak' }
 
   # ---------------------------------------------------------------- OpenWrt (LuCI: Services > MonoWordTest)
   openwrt:
@@ -215,6 +236,7 @@ jobs:
             sh -c 'apk add --no-cache apk-tools >/dev/null && apk --version && sh openwrt/build.sh apk "$1" out && apk adbdump out/*.apk' sh "${{ steps.ver.outputs.v }}"
       - uses: actions/upload-artifact@v7
         with:
+          retention-days: 3
           name: MonoWordTest-openwrt
           path: |
             out/*.ipk
@@ -235,19 +257,30 @@ jobs:
         run: |
           set -e
           VER=$(node -p "require('./package.json').version")
-          mkdir www && cp index.html translations.js ads.js dictionary.js www/
-          npm install --no-save --no-audit --no-fund @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6
+          mkdir www && sh tools/stage_web.sh www && cp android-extra/secret.html www/
+          npm install --no-save --no-audit --no-fund @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 @capacitor/app@6
           npx cap init MonoWordTest io.github.monowordtest --web-dir=www
           npx cap add android
           sudo apt-get update -qq && sudo apt-get install -y python3-pil
           python3 tools/make_icons.py --android android/app/src/main/res
           grep -q 'android:icon="@mipmap/ic_launcher"' android/app/src/main/AndroidManifest.xml || { echo "manifest does not use @mipmap/ic_launcher"; exit 1; }
+          # hidden, launcher-less Activity (see android-extra/)
+          JAVA_DIR=android/app/src/main/java/io/github/monowordtest
+          mkdir -p "$JAVA_DIR" && cp android-extra/SecretActivity.java "$JAVA_DIR/"
+          python3 - <<'PY'
+          p = 'android/app/src/main/AndroidManifest.xml'
+          s = open(p, encoding='utf-8').read()
+          a = '<activity android:name=".SecretActivity" android:exported="true" android:label="MonoWordTest (secret)" android:theme="@android:style/Theme.DeviceDefault.NoActionBar" />'
+          assert '</application>' in s
+          open(p, 'w', encoding='utf-8').write(s.replace('</application>', '    ' + a + '\n    </application>', 1))
+          PY
+          grep -q SecretActivity android/app/src/main/AndroidManifest.xml
           npx cap sync android
           (cd android && chmod +x gradlew && ./gradlew assembleDebug)
           mkdir out
           cp android/app/build/outputs/apk/debug/app-debug.apk "out/MonoWordTest-${VER}-android.apk"
       - uses: actions/upload-artifact@v7
-        with: { name: MonoWordTest-android, path: out/*.apk }
+        with: { retention-days: 3, name: MonoWordTest-android, path: out/*.apk }
 
   # ---------------------------------------------------------------- GitHub Release (tags only)
   release:
