@@ -5,3 +5,4 @@ android/
 capacitor.config.*
 *.log
 ads.text.js
+build/locale/
