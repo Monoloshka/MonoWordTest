@@ -1,4 +1,5 @@
-#!/usr/bin/env python3
+#!/bin/sh
+''''exec python3 "$0" "$@" # '''
 """Derive every icon size from ONE source file: build/icon.png (square PNG, 1024 px recommended).
 
   python3 tools/make_icons.py                      -> build/icons/NxN.png   (Linux / Flatpak / deb / rpm / AppImage)

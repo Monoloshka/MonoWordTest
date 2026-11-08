@@ -1,4 +1,5 @@
-#!/usr/bin/env python3
+#!/bin/sh
+''''exec python3 "$0" "$@" # '''
 """Build ads.js from ads/ads.txt. Images are embedded as base64 data URIs (nothing is loaded from the internet).
 
   python3 tools/build_ads.py                          -> ads.js (banners + text ads)
