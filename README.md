@@ -21,7 +21,7 @@ with the **+** button (files from `languages/`).
 
 `index.html` + the neighbouring `.js` files are the readable source version (they must stay together in one folder).
 After changing anything (ads, about, sounds, dictionary, version ...) run `python3 tools/build_all.py` (or the single tools,
-and finally `python3 tools/build_single.py`) and commit the regenerated `MonoWordTest.html`; CI checks that it is up to date.
+and finally `python3 tools/build_single.py`) and commit the regenerated `MonoWordTest.html` (handy for opening straight from a clone). GitHub Actions never trusts the committed copies: its first job (`prepare`) regenerates `dictionary.js`, `ads.js`, `about.js`, `sounds.js`, the `.po` files and `MonoWordTest.html` from the sources and hands them to all other jobs, so a forgotten regeneration cannot break a build.
 
 ## Start screen options
 
@@ -133,7 +133,7 @@ the app simply has English plus the imported language files; a missing string fa
 
 `dictionary.txt` is the built-in dictionary (edit it freely). `dictionary.js` is the same text wrapped into a JavaScript string,
 because a page opened straight from disk (`file://`) cannot read a neighbouring `.txt`, but it can load a neighbouring script.
-After editing the txt run `python3 tools/build_dictionary.py` (CI checks that they match).
+After editing the txt run `python3 tools/build_dictionary.py` (CI regenerates it anyway).
 
 ## License
 
@@ -226,3 +226,14 @@ nothing in the app opens it, but it is exported, so an activity-launcher app can
 Electron packages contain a whole Chromium (about 70-100 MB each); the Android APK uses the phone's WebView (about 5 MB).
 `electronLanguages` in `package.json` keeps only the needed Chromium locales, and artifacts are kept for 3 days
 (GitHub's free artifact storage is only 500 MB). Download finished builds from the GitHub Release (tag `vX.Y.Z`).
+
+## Android: Exit button and hidden Activity
+
+`android-extra/MainActivity.java` replaces Capacitor's default `MainActivity` during the CI build and adds `window.MWTAndroid.exit()`
+(closes the task); the page's **Exit** button uses it first, then the Capacitor App plugin, then `window.close()`.
+The same job copies `SecretActivity` into the APK, adds it to the manifest, checks that `index.html`, `dictionary.js`, `about.js`,
+`ads.js`, `sounds.js` and `secret.html` really are inside the app assets, and prints the Activities found in the finished APK
+(step "Show which Activities the APK really contains").
+
+Do not run `.py` files with `sh` in a shell that has no header: `import sys` would be executed by ImageMagick's `import`
+(a screenshot tool) and writes a huge file called `sys`. The tools in `tools/` now carry a header that makes `sh tools/x.py` work.

@@ -91,6 +91,7 @@
   body.dark .ans.wrong { background: #d9534f; border-color: #b52b27; color: #fff; }
   body.dark .ans.right { background: #3c9d4a; border-color: #2b7a37; color: #fff; }
   body.dark #adText, body.dark #aboutLinks a { color: #f0a58a; }
+  body.dark .siteIcon { background: #f0eee6; border-radius: 4px; padding: 1px; box-sizing: content-box; }
   body.dark #toast { background: #f0eee6; color: #141413; }
   body.dark #ctxMenu { background: #2b2a28; border-color: #4a4843; }
   body.dark #ctxMenu button:hover { background: #3a3835; }
@@ -280,7 +281,7 @@
   /* running as a real app (Electron / NW.js / Capacitor) and not in a browser tab or on a router page? */
   function isStandalone() {
     try {
-      if (window.MWT_STANDALONE) { return true; }
+      if (window.MWT_STANDALONE || window.MWTAndroid) { return true; }
       if (/Electron\//.test(navigator.userAgent)) { return true; }
       if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) { return true; }
     } catch (e) { }
@@ -828,7 +829,9 @@
       }
       if (it.icon) {
         var im = document.createElement('img');
-        im.src = it.icon; im.alt = ''; im.className = 'siteIcon'; im.draggable = false;
+        im.alt = ''; im.className = 'siteIcon'; im.draggable = false;
+        im.onerror = function () { this.style.display = 'none'; };      // a broken picture leaves no empty box
+        im.src = it.icon;
         holder.appendChild(im);
       }
       holder.appendChild(document.createTextNode(it.text));
@@ -899,11 +902,13 @@
     newRound();
   }
   function doExit() {
+    try { if (window.MWTAndroid && window.MWTAndroid.exit) { window.MWTAndroid.exit(); return; } } catch (e0) { }   // Android app (MainActivity bridge)
     try {
       var C = window.Capacitor;
       if (C && C.Plugins && C.Plugins.App && C.Plugins.App.exitApp) { C.Plugins.App.exitApp(); return; }
+      if (C && C.nativePromise) { C.nativePromise('App', 'exitApp', {}); return; }
     } catch (e) { }
-    try { window.close(); } catch (e2) { }
+    try { window.close(); } catch (e2) { }                                                                         // Electron, NW.js
   }
   function exitApp() {
     stopTimer();

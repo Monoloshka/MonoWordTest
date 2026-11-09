@@ -6,6 +6,7 @@ DEST=${1:?destination dir}
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 mkdir -p "$DEST/sounds"
 for f in index.html ads.js about.js sounds.js dictionary.js; do
+	[ -f "$ROOT/$f" ] || { echo "stage_web.sh: $f is missing - run: python3 tools/build_all.py" >&2; exit 1; }
 	cp "$ROOT/$f" "$DEST/$f"
 done
 cp "$ROOT"/sounds/*.mp3 "$DEST/sounds/" 2>/dev/null || true

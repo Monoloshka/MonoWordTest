@@ -8,6 +8,8 @@
 ads.txt line:  image file | https://link | alt text      (use  -  instead of an image file for a text-only ad)
 """
 import argparse, base64, json, os, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from _svg import fix_svg
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ADS_DIR = os.path.join(ROOT, 'ads')
@@ -42,6 +44,10 @@ with open(os.path.join(ADS_DIR, 'ads.txt'), encoding='utf-8-sig') as f:
                 sys.exit('ads.txt line %d: file not found: %s' % (n, path))
             with open(path, 'rb') as img:
                 raw = img.read()
+            if ext == '.svg':
+                raw, warns = fix_svg(raw, name)
+                for w in warns:
+                    print('note:', w)
             if len(raw) > 500 * 1024:
                 print('warning: %s is %d KB - consider shrinking it' % (name, len(raw) // 1024))
             entry['mime'] = MIME[ext]

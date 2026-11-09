@@ -6,6 +6,8 @@
   python3 tools/build_about.py --check    exit 1 if about.js has a different version than package.json
 """
 import base64, io, json, os, re, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from _svg import fix_svg
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ABOUT = os.path.join(ROOT, 'about')
@@ -26,7 +28,12 @@ if '--check' in sys.argv:
 
 
 def data_uri(path, mime):
-    return 'data:%s;base64,%s' % (mime, base64.b64encode(open(path, 'rb').read()).decode('ascii'))
+    raw = open(path, 'rb').read()
+    if mime == 'image/svg+xml':
+        raw, warns = fix_svg(raw, os.path.basename(path))
+        for w in warns:
+            print('note:', w)
+    return 'data:%s;base64,%s' % (mime, base64.b64encode(raw).decode('ascii'))
 
 
 def app_icon():
