@@ -14,20 +14,33 @@ env:
   NODE_VERSION: '22'
 
 jobs:
+  # ---------------------------------------------------------------- generated files
+  prepare:
+    name: Generate dictionary.js, ads.js, about.js, sounds.js, MonoWordTest.html
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - name: Check language files are valid JSON
+        run: python3 -c "import glob,json;[json.load(open(f,encoding='utf-8-sig')) for f in glob.glob('languages/*.json')];print('language files ok')"
+      - run: sudo apt-get update -qq && sudo apt-get install -y python3-pil
+      - name: Generate everything from the sources (committed copies are never trusted, so a forgotten regeneration cannot break a build)
+        run: python3 tools/build_all.py
+      - run: tar cf generated.tar dictionary.js ads.js about.js sounds.js MonoWordTest.html po build/locale
+      - uses: actions/upload-artifact@v7
+        with: { retention-days: 3, name: generated-files, path: generated.tar }
+
   # ---------------------------------------------------------------- universal
   web:
     name: Web zip (any browser, ReactOS, Win 9x/2000 with an old browser)
     runs-on: ubuntu-24.04
+    needs: [prepare]
     steps:
       - uses: actions/checkout@v7
-      - name: Check about.js matches package.json version
-        run: python3 tools/build_about.py --check
-      - name: Check language files are valid JSON
-        run: python3 -c "import glob,json;[json.load(open(f,encoding='utf-8-sig')) for f in glob.glob('languages/*.json')];print('language files ok')"
-      - name: Check dictionary.js matches dictionary.txt
-        run: python3 tools/build_dictionary.py --check
-      - name: Check the one-file build is up to date
-        run: python3 tools/build_single.py --check
+      - uses: actions/download-artifact@v8
+        with: { name: generated-files }
+      - name: Unpack generated files
+        shell: bash
+        run: tar xf generated.tar
       - name: Zip
         run: |
           VER=$(node -p "require('./package.json').version")
@@ -49,12 +62,18 @@ jobs:
   win-modern:
     name: Windows 10/11 portable .exe (${{ matrix.arch }})
     runs-on: windows-latest
+    needs: [prepare]
     strategy:
       fail-fast: false
       matrix:
         arch: [x64, ia32, arm64]
     steps:
       - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with: { name: generated-files }
+      - name: Unpack generated files
+        shell: bash
+        run: tar xf generated.tar
       - uses: actions/setup-node@v7
         with: { node-version: '${{ env.NODE_VERSION }}' }
       - run: npm install --no-audit --no-fund
@@ -68,9 +87,15 @@ jobs:
   win-legacy:
     name: Windows 7/8/8.1 portable .exe (Electron 22)
     runs-on: windows-latest
+    needs: [prepare]
     continue-on-error: true
     steps:
       - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with: { name: generated-files }
+      - name: Unpack generated files
+        shell: bash
+        run: tar xf generated.tar
       - uses: actions/setup-node@v7
         with: { node-version: '${{ env.NODE_VERSION }}' }
       - shell: bash
@@ -87,9 +112,15 @@ jobs:
   win-msi:
     name: Windows .msi (x64)
     runs-on: windows-latest
+    needs: [prepare]
     continue-on-error: true
     steps:
       - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with: { name: generated-files }
+      - name: Unpack generated files
+        shell: bash
+        run: tar xf generated.tar
       - uses: actions/setup-node@v7
         with: { node-version: '${{ env.NODE_VERSION }}' }
       - shell: bash
@@ -103,9 +134,15 @@ jobs:
   win-xp:
     name: Windows XP/Vista zip (NW.js 0.14.7, experimental)
     runs-on: ubuntu-24.04
+    needs: [prepare]
     continue-on-error: true
     steps:
       - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with: { name: generated-files }
+      - name: Unpack generated files
+        shell: bash
+        run: tar xf generated.tar
       - name: Assemble NW.js bundle
         run: |
           set -e
@@ -131,11 +168,17 @@ jobs:
   macos:
     name: macOS .app (zip), .dmg, .pkg
     runs-on: macos-latest
+    needs: [prepare]
     continue-on-error: true
     env:
       CSC_IDENTITY_AUTO_DISCOVERY: 'false'   # unsigned builds
     steps:
       - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with: { name: generated-files }
+      - name: Unpack generated files
+        shell: bash
+        run: tar xf generated.tar
       - uses: actions/setup-node@v7
         with: { node-version: '${{ env.NODE_VERSION }}' }
       - run: npm install --no-audit --no-fund
@@ -153,6 +196,7 @@ jobs:
   linux:
     name: Linux AppImage, deb, rpm, pacman, tar.gz (${{ matrix.arch }})
     runs-on: ubuntu-24.04
+    needs: [prepare]
     continue-on-error: ${{ matrix.arch == 'arm64' }}
     strategy:
       fail-fast: false
@@ -160,6 +204,11 @@ jobs:
         arch: [x64, arm64]
     steps:
       - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with: { name: generated-files }
+      - name: Unpack generated files
+        shell: bash
+        run: tar xf generated.tar
       - uses: actions/setup-node@v7
         with: { node-version: '${{ env.NODE_VERSION }}' }
       - name: Icons (all sizes from build/icon.png)
@@ -178,9 +227,15 @@ jobs:
   linux-snap:
     name: Linux .snap (experimental)
     runs-on: ubuntu-24.04
+    needs: [prepare]
     continue-on-error: true
     steps:
       - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with: { name: generated-files }
+      - name: Unpack generated files
+        shell: bash
+        run: tar xf generated.tar
       - uses: actions/setup-node@v7
         with: { node-version: '${{ env.NODE_VERSION }}' }
       - name: Icons (all sizes from build/icon.png)
@@ -194,9 +249,15 @@ jobs:
   linux-flatpak:
     name: Linux .flatpak (experimental)
     runs-on: ubuntu-24.04
+    needs: [prepare]
     continue-on-error: true
     steps:
       - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with: { name: generated-files }
+      - name: Unpack generated files
+        shell: bash
+        run: tar xf generated.tar
       - uses: actions/setup-node@v7
         with: { node-version: '${{ env.NODE_VERSION }}' }
       - name: Icons (all sizes from build/icon.png)
@@ -216,8 +277,14 @@ jobs:
   openwrt:
     name: OpenWrt .ipk (opkg) and .apk (apk-tools)
     runs-on: ubuntu-24.04
+    needs: [prepare]
     steps:
       - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with: { name: generated-files }
+      - name: Unpack generated files
+        shell: bash
+        run: tar xf generated.tar
       - name: Version
         id: ver
         run: echo "v=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
@@ -246,9 +313,15 @@ jobs:
   android:
     name: Android .apk (Capacitor)
     runs-on: ubuntu-24.04
+    needs: [prepare]
     continue-on-error: true
     steps:
       - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with: { name: generated-files }
+      - name: Unpack generated files
+        shell: bash
+        run: tar xf generated.tar
       - uses: actions/setup-node@v7
         with: { node-version: '${{ env.NODE_VERSION }}' }
       - uses: actions/setup-java@v5
@@ -264,9 +337,11 @@ jobs:
           sudo apt-get update -qq && sudo apt-get install -y python3-pil
           python3 tools/make_icons.py --android android/app/src/main/res
           grep -q 'android:icon="@mipmap/ic_launcher"' android/app/src/main/AndroidManifest.xml || { echo "manifest does not use @mipmap/ic_launcher"; exit 1; }
-          # hidden, launcher-less Activity (see android-extra/)
+          # our MainActivity (adds window.MWTAndroid.exit() for the Exit button) and the hidden, launcher-less SecretActivity
           JAVA_DIR=android/app/src/main/java/io/github/monowordtest
-          mkdir -p "$JAVA_DIR" && cp android-extra/SecretActivity.java "$JAVA_DIR/"
+          [ -f "$JAVA_DIR/MainActivity.java" ] || { echo "MainActivity.java not where expected:"; find android/app/src/main/java -name '*.java'; exit 1; }
+          cp android-extra/MainActivity.java "$JAVA_DIR/MainActivity.java"
+          cp android-extra/SecretActivity.java "$JAVA_DIR/SecretActivity.java"
           python3 - <<'PY'
           p = 'android/app/src/main/AndroidManifest.xml'
           s = open(p, encoding='utf-8').read()
@@ -276,9 +351,18 @@ jobs:
           PY
           grep -q SecretActivity android/app/src/main/AndroidManifest.xml
           npx cap sync android
+          for f in index.html dictionary.js about.js ads.js sounds.js secret.html; do
+            test -s "android/app/src/main/assets/public/$f" || { echo "missing in the app assets: $f"; exit 1; }
+          done
           (cd android && chmod +x gradlew && ./gradlew assembleDebug)
           mkdir out
           cp android/app/build/outputs/apk/debug/app-debug.apk "out/MonoWordTest-${VER}-android.apk"
+      - name: Show which Activities the APK really contains
+        continue-on-error: true
+        run: |
+          AAPT2=$(ls "${ANDROID_HOME:-$ANDROID_SDK_ROOT}"/build-tools/*/aapt2 | sort -V | tail -1)
+          "$AAPT2" dump xmltree --file AndroidManifest.xml out/*.apk | grep -E "A: android:name|E: activity" | grep -E "Activity" || true
+          "$AAPT2" dump xmltree --file AndroidManifest.xml out/*.apk | grep -q SecretActivity && echo "SecretActivity is in the APK"
       - uses: actions/upload-artifact@v7
         with: { retention-days: 3, name: MonoWordTest-android, path: out/*.apk }
 
@@ -286,7 +370,7 @@ jobs:
   release:
     name: Attach everything to the GitHub Release
     if: ${{ !cancelled() && startsWith(github.ref, 'refs/tags/v') }}
-    needs: [web, win-modern, win-legacy, win-msi, win-xp, macos, linux, linux-snap, linux-flatpak, openwrt, android]
+    needs: [prepare, web, win-modern, win-legacy, win-msi, win-xp, macos, linux, linux-snap, linux-flatpak, openwrt, android]
     runs-on: ubuntu-24.04
     permissions:
       contents: write
