@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# Optional convenience launcher for Flatpak users. Grants only directories explicitly named
+# by existing --open / --lang paths and the parent directory of --log (not the whole host filesystem).
+set -euo pipefail
+APP_ID="io.github.monowordtest"
+declare -A access=()
+args=("$@")
+add_path() {
+  local value="$1" mode="$2" existing="${3:-0}" abs dir
+  [[ -n "$value" && ! "$value" =~ ^https?:// ]] || return 0
+  [[ "$existing" != "1" || -e "$value" ]] || return 0
+  abs="$(realpath -m -- "$value" 2>/dev/null || printf '%s' "$value")"
+  if [[ -d "$abs" ]]; then dir="$abs"; else dir="$(dirname -- "$abs")"; fi
+  [[ -d "$dir" ]] || return 0
+  if [[ "$mode" == "rw" ]]; then access["$dir"]="rw"
+  elif [[ -z "${access[$dir]:-}" ]]; then access["$dir"]="ro"; fi
+}
+need_value=""
+need_existing=0
+for arg in "${args[@]}"; do
+  if [[ -n "$need_value" ]]; then add_path "$arg" "$need_value" "$need_existing"; need_value=""; need_existing=0; continue; fi
+  case "$arg" in
+    --open) need_value="ro"; need_existing=1 ;;
+    --lang) need_value="ro"; need_existing=1 ;;
+    --log) need_value="rw"; need_existing=0 ;;
+    --open=*) add_path "${arg#*=}" ro 1 ;;
+    --lang=*) add_path "${arg#*=}" ro 1 ;;
+    --log=*) add_path "${arg#*=}" rw 0 ;;
+    http://*|https://*) ;;
+    -*|--*) ;;
+    *) add_path "$arg" ro 1 ;;
+  esac
+done
+grant=()
+for dir in "${!access[@]}"; do
+  if [[ "${access[$dir]}" == "ro" ]]; then grant+=( "--filesystem=$dir:ro" )
+  else grant+=( "--filesystem=$dir" ); fi
+done
+exec flatpak run "${grant[@]}" "$APP_ID" "${args[@]}"

@@ -1,0 +1,30 @@
+# About screen. Generated into about.js by: python3 tools/build_about.py
+# The app icon (build/icon.png) and version (package.json) are added automatically.
+# Every text below is an English source string translated through languages/*.json.
+author: Author app Monoloshka (Dmitriy Yakovenko)
+
+# Normal line: text | link | site icon (optional)
+# Use "copy: VALUE" as the second field to copy a value when tapped.
+# == Title == starts a collapsible section.
+Project page on GitHub | https://github.com/Monoloshka/MonoWordTest | github.svg
+Report a problem | https://github.com/Monoloshka/MonoWordTest/issues | github.svg
+Made with the help of Claude | https://claude.com/product/overview | claude.svg
+Modified by ChatGPT | https://chatgpt.com/overview | chatgpt.svg
+Thank you for playing! | |
+
+== Support the author (voluntary donations) ==
+NOWPayments | https://nowpayments.io/donation/monoloshka |
+DonationAlerts | https://www.donationalerts.com/r/monoloshkayt |
+DonatePay | https://new.donatepay.ru/@monoloshkatwitch |
+DonateX | https://donatex.gg/donate/Monoloshka |
+Tap a number to copy it. | |
+WebMoney € (WME): E962356555652 | copy: E962356555652 |
+WebMoney $ (WMZ): Z650617738625 | copy: Z650617738625 |
+WebMoney ₿ (WMX): X561486620235 | copy: X561486620235 |
+
+== Social networks and profiles ==
+Taplink | https://taplink.cc/s1f |
+Lit.link | https://lit.link/monoloshka |
+Carrd | https://monoloshka.carrd.co |
+Beacons | https://beacons.ai/monoloshka |
+Linktree | https://linktr.ee/monoloshka |

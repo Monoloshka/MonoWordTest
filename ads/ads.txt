@@ -1,0 +1,40 @@
+# One ad per line:  image file (in this folder) | link opened in the browser | alt text
+# Use .png (also supported: .jpg .jpeg .gif .webp .svg). Optimize PNGs first (e.g. FileOptimizer):
+# images are stored as base64 inside ads.js, which makes them ~33% bigger.
+# Write  -  instead of an image file for a plain text link (the third column is then the visible text).
+# The OpenWrt package never contains images: every line there becomes a text link, so give every line a meaningful text.
+# After editing, run:  python3 tools/build_ads.py
+# Remove a line (or comment it out with #) to remove that ad. Replace the SAMPLE lines below with your own.
+banner1.gif | https://rapidgator.net/affiliate/ref/3885551 | Rapidgator.net
+banner2.png | http://RegionAds.ru/?ref=1493 | RegionAds
+banner3.gif | https://www.bestchange.pro/?p=1300520 | BestChange - Мониторинг обменников в интернете
+banner4.gif | https://www.bestchange.ru/?p=1300520 | BestChange - Мониторинг обменников в интернете
+banner5.gif | https://www.bestchange.com/?p=1300520 | E-currency exchanger monitor BestChange
+banner6.gif | https://www.bestchange.com/?p=1300520 | E-currency exchanger monitor BestChange
+banner7.webp | https://www.exitlag.com/refer/10131364 | Exitlag
+banner8.png | https://aeza.net/?ref=614355 | Aeza
+banner9.png | https://aeza.net/?ref=614355 | Aeza
+banner10.png | https://aeza.net/?ref=614355 | Aeza
+banner11.png | https://www.youtube.com/@%D0%9C%D0%BE%D0%BD%D0%BE%D0%BB%D0%BE%D1%88%D0%BA%D0%B0-%D1%874%D0%BE | Монолошка
+banner11.png | https://youtube.com/channel/UCKlc3zgsGBXMuWwuGaAyOZw | Монолошка
+banner12.png | https://www.youtube.com/@mijirunamusic | Mijiruna Music
+banner12.png | https://www.youtube.com/channel/UCQ20bmdrR1i9XusH0nCDCLQ | Mijiruna Music
+- | https://vdsina.ru/?partner=ak2484jerz1w | Хостинг облачных VDS/VPS серверов
+- | https://vdsina.ru/?partner=mdk9sh6by19q  | Хостинг облачных VDS/VPS серверов
+- | https://www.vdsina.com/?partner=n7sjzez8whn6  | Hosting of cloud VDS/VPS servers
+- | https://www.vdsina.com/?partner=q13r6db27t4y  | Hosting of cloud VDS/VPS servers
+- | https://www.bestchange.pro/?p=1300520 | BestChange - Мониторинг обменников в интернете
+- | https://www.bestchange.ru/?p=1300520 | BestChange - Мониторинг обменников в интернете
+- | https://www.bestchange.pro/?p=1300520 | BestChange - Выгодный курс обмена электронных валют
+- | https://www.bestchange.ru/?p=1300520 | BestChange - Выгодный курс обмена электронных валют
+- | https://www.bestchange.com/?p=1300520 | E-currency exchanger monitor BestChange
+- | http://RegionAds.ru/?ref=1493 | RegionAds - Качественная реклама на сайтах вашего региона
+- | https://www.exitlag.com/refer/10131364 | Exitlag - Максимум соединения в 2000+ играх
+- | https://www.exitlag.com/refer/10131364 | Exitlag - Maximum connection in 2000+ games
+- | https://aeza.net/?ref=614355 | Создать сервер в 2 клика с aeza.net
+- | https://t.me/pswallet?startapp=REF-ql2uCvcGzf | PsWallet Криптокошелек у тебя в Telegram
+- | https://t.me/pswallet?startapp=REF-ql2uCvcGzf | PsWallet Your crypto wallet in Telegram
+- | https://pixai.art/referral?refCode=ACXP9RYT&utm_source=referral&ref_entry=bonus_quest&ref_platform=web | Pixai - Один из ведущих в мире генераторов аниме-арта на основе искусственного интеллекта.
+- | https://pixai.art/referral?refCode=ACXP9RYT&utm_source=referral&ref_entry=bonus_quest&ref_platform=web | Pixai - One of the world's leading AI-powered anime art generators.
+- | https://file.al/free315291.html | File.al - The easy way to Store, manage and share your files
+- | https://file.al/free315291.html | File.al - Простой способ хранить, управлять и обмениваться файлами
