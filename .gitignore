@@ -1,0 +1,10 @@
+node_modules/
+dist/
+www/
+android/
+capacitor.config.*
+*.log
+ads.text.js
+build/locale/
+__pycache__/
+*.py[cod]
