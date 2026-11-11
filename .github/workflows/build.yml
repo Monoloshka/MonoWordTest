@@ -1,0 +1,372 @@
+name: Build packages
+
+# Run manually (Actions tab -> "Build packages" -> Run workflow) or push a tag like v1.0.0
+# to build everything and attach it to a GitHub Release. Keep "version" in package.json in sync with the tag.
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: '22'
+
+jobs:
+  # ---------------------------------------------------------------- generated files
+  prepare:
+    name: Generate dictionary.js, ads.js, about.js, sounds.js, MonoWordTest.html
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - name: Check language files are valid JSON
+        run: python3 -c "import glob,json;[json.load(open(f,encoding='utf-8-sig')) for f in glob.glob('languages/*.json')];print('language files ok')"
+      - run: sudo apt-get update -qq && sudo apt-get install -y python3-pil
+      - name: Generate everything from the sources (committed copies are never trusted, so a forgotten regeneration cannot break a build)
+        run: python3 tools/build_all.py
+      - run: tar cf generated.tar dictionary.js ads.js about.js sounds.js MonoWordTest.html po build/locale
+      - uses: actions/upload-artifact@v7
+        with: { retention-days: 3, name: generated-files, path: generated.tar }
+
+  # ---------------------------------------------------------------- universal
+  web:
+    name: Web zip (any browser, ReactOS, Win 9x/2000 with an old browser)
+    runs-on: ubuntu-24.04
+    needs: [prepare]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with: { name: generated-files }
+      - name: Unpack generated files
+        shell: bash
+        run: tar xf generated.tar
+      - name: Zip
+        run: |
+          VER=$(node -p "require('./package.json').version")
+          sh tools/stage_web.sh stage
+          cp dictionary.txt claude.svg README.md stage/
+          cp -r languages stage/languages
+          mkdir out && (cd stage && zip -qr "../out/MonoWordTest-${VER}-web.zip" .)
+          zip -qr "out/MonoWordTest-${VER}-languages.zip" languages
+          cp MonoWordTest.html "out/MonoWordTest-${VER}.html"
+      - uses: actions/upload-artifact@v7
+        with:
+          retention-days: 3
+          name: MonoWordTest-web
+          path: |
+            out/*.zip
+            out/*.html
+
+  # ---------------------------------------------------------------- Windows 10/11 (+ Wine/Proton)
+  win-modern:
+    name: Windows 10/11 portable .exe (${{ matrix.arch }})
+    runs-on: windows-latest
+    needs: [prepare]
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x64, ia32, arm64]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with: { name: generated-files }
+      - name: Unpack generated files
+        shell: bash
+        run: tar xf generated.tar
+      - uses: actions/setup-node@v7
+        with: { node-version: '${{ env.NODE_VERSION }}' }
+      - run: npm install --no-audit --no-fund
+        shell: bash
+      - run: npx electron-builder --win portable --${{ matrix.arch }} --publish never
+        shell: bash
+      - uses: actions/upload-artifact@v7
+        with: { retention-days: 3, name: 'MonoWordTest-win10-11-${{ matrix.arch }}', path: 'dist/MonoWordTest-*.exe' }
+
+  # ---------------------------------------------------------------- Windows 7 / 8 / 8.1 (+ Wine/Proton)
+  win-legacy:
+    name: Windows 7/8/8.1 portable .exe (Electron 22)
+    runs-on: windows-latest
+    needs: [prepare]
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with: { name: generated-files }
+      - name: Unpack generated files
+        shell: bash
+        run: tar xf generated.tar
+      - uses: actions/setup-node@v7
+        with: { node-version: '${{ env.NODE_VERSION }}' }
+      - shell: bash
+        run: |
+          npm install --no-audit --no-fund
+          npm install --no-save --no-audit --no-fund electron@22.3.27   # last Electron that runs on Windows 7/8/8.1
+          npx electron-builder --win portable --x64 --ia32 --publish never \
+            -c.electronVersion=22.3.27 \
+            '-c.portable.artifactName=MonoWordTest-${version}-win7-8-8.1-${arch}-portable.${ext}'
+      - uses: actions/upload-artifact@v7
+        with: { retention-days: 3, name: MonoWordTest-win7-8-8.1, path: 'dist/MonoWordTest-*.exe' }
+
+  # ---------------------------------------------------------------- Windows installer-style package
+  win-msi:
+    name: Windows .msi (x64)
+    runs-on: windows-latest
+    needs: [prepare]
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with: { name: generated-files }
+      - name: Unpack generated files
+        shell: bash
+        run: tar xf generated.tar
+      - uses: actions/setup-node@v7
+        with: { node-version: '${{ env.NODE_VERSION }}' }
+      - shell: bash
+        run: |
+          npm install --no-audit --no-fund
+          npx electron-builder --win msi --x64 --publish never
+      - uses: actions/upload-artifact@v7
+        with: { retention-days: 3, name: MonoWordTest-win-msi, path: 'dist/MonoWordTest-*.msi' }
+
+  # ---------------------------------------------------------------- Windows XP / Vista (experimental)
+  win-xp:
+    name: Windows XP/Vista zip (NW.js 0.14.7, experimental)
+    runs-on: ubuntu-24.04
+    needs: [prepare]
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with: { name: generated-files }
+      - name: Unpack generated files
+        shell: bash
+        run: tar xf generated.tar
+      - name: Assemble NW.js bundle
+        run: |
+          set -e
+          VER=$(node -p "require('./package.json').version")
+          NW=nwjs-v0.14.7-win-ia32
+          curl -fsSL -o nw.zip "https://dl.nwjs.io/v0.14.7/${NW}.zip"
+          unzip -q nw.zip
+          mkdir -p "$NW/package.nw"
+          sh tools/stage_web.sh "$NW/package.nw"
+          cp desktop/nw-bridge.js "$NW/package.nw/"
+          cp build/icon.png "$NW/package.nw/icon.png"
+          cat > "$NW/package.nw/package.json" <<'EOF'
+          {"name":"monowordtest","main":"index.html","inject-js-start":"nw-bridge.js","window":{"title":"MonoWordTest","width":960,"height":680,"min_width":360,"min_height":480,"icon":"icon.png"}}
+          EOF
+          mv "$NW/nw.exe" "$NW/MonoWordTest.exe"
+          mv "$NW" MonoWordTest-winxp-vista
+          mkdir out
+          zip -qr "out/MonoWordTest-${VER}-winxp-vista-ia32.zip" MonoWordTest-winxp-vista
+      - uses: actions/upload-artifact@v7
+        with: { retention-days: 3, name: MonoWordTest-winxp-vista, path: out/*.zip }
+
+  # ---------------------------------------------------------------- macOS
+  macos:
+    name: macOS .app (zip), .dmg, .pkg
+    runs-on: macos-latest
+    needs: [prepare]
+    continue-on-error: true
+    env:
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false'   # unsigned builds
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with: { name: generated-files }
+      - name: Unpack generated files
+        shell: bash
+        run: tar xf generated.tar
+      - uses: actions/setup-node@v7
+        with: { node-version: '${{ env.NODE_VERSION }}' }
+      - run: npm install --no-audit --no-fund
+      - run: npx electron-builder --mac zip dmg --x64 --arm64 --publish never
+      - name: .pkg x64 (optional)
+        continue-on-error: true
+        run: npx electron-builder --mac pkg --x64 --publish never
+      - name: .pkg arm64 (optional)
+        continue-on-error: true
+        run: npx electron-builder --mac pkg --arm64 --publish never
+      - uses: actions/upload-artifact@v7
+        with: { retention-days: 3, name: MonoWordTest-macos, path: 'dist/MonoWordTest-*.*' }
+
+  # ---------------------------------------------------------------- Linux
+  linux:
+    name: Linux AppImage, deb, rpm, pacman, tar.gz (${{ matrix.arch }})
+    runs-on: ubuntu-24.04
+    needs: [prepare]
+    continue-on-error: ${{ matrix.arch == 'arm64' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x64, arm64]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with: { name: generated-files }
+      - name: Unpack generated files
+        shell: bash
+        run: tar xf generated.tar
+      - uses: actions/setup-node@v7
+        with: { node-version: '${{ env.NODE_VERSION }}' }
+      - name: Icons (all sizes from build/icon.png)
+        run: sudo apt-get update -qq && sudo apt-get install -y python3-pil && python3 tools/make_icons.py
+      - run: sudo apt-get update && sudo apt-get install -y rpm libarchive-tools
+      - run: npm install --no-audit --no-fund
+      - run: npx electron-builder --linux AppImage deb pacman tar.gz --${{ matrix.arch }} --publish never
+      - name: rpm (separate step so a failure cannot lose the other formats)
+        continue-on-error: true
+        run: |
+          npx electron-builder --linux rpm --${{ matrix.arch }} --publish never || \
+          npx electron-builder --linux rpm --${{ matrix.arch }} --publish never -c.rpm.compression=gzip
+      - uses: actions/upload-artifact@v7
+        with: { retention-days: 3, name: 'MonoWordTest-linux-${{ matrix.arch }}', path: 'dist/MonoWordTest-*' }
+
+  linux-snap:
+    name: Linux .snap (experimental)
+    runs-on: ubuntu-24.04
+    needs: [prepare]
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with: { name: generated-files }
+      - name: Unpack generated files
+        shell: bash
+        run: tar xf generated.tar
+      - uses: actions/setup-node@v7
+        with: { node-version: '${{ env.NODE_VERSION }}' }
+      - name: Icons (all sizes from build/icon.png)
+        run: sudo apt-get update -qq && sudo apt-get install -y python3-pil && python3 tools/make_icons.py
+      - run: sudo snap install snapcraft --classic
+      - run: npm install --no-audit --no-fund
+      - run: npx electron-builder --linux snap --x64 --publish never
+      - uses: actions/upload-artifact@v7
+        with: { retention-days: 3, name: MonoWordTest-linux-snap, path: 'dist/*.snap' }
+
+  linux-flatpak:
+    name: Linux .flatpak (experimental)
+    runs-on: ubuntu-24.04
+    needs: [prepare]
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with: { name: generated-files }
+      - name: Unpack generated files
+        shell: bash
+        run: tar xf generated.tar
+      - uses: actions/setup-node@v7
+        with: { node-version: '${{ env.NODE_VERSION }}' }
+      - name: Icons (all sizes from build/icon.png)
+        run: sudo apt-get update -qq && sudo apt-get install -y python3-pil && python3 tools/make_icons.py
+      - run: |
+          sudo apt-get update && sudo apt-get install -y flatpak flatpak-builder elfutils
+          flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+          flatpak install --user -y flathub org.freedesktop.Platform//24.08 org.freedesktop.Sdk//24.08 org.electronjs.Electron2.BaseApp//24.08
+      - run: npm install --no-audit --no-fund
+      - name: gettext catalogues for /app/share/locale
+        run: python3 tools/make_po.py
+      - run: npx electron-builder --linux flatpak --x64 --publish never
+      - uses: actions/upload-artifact@v7
+        with: { retention-days: 3, name: MonoWordTest-linux-flatpak, path: 'dist/*.flatpak' }
+
+  # ---------------------------------------------------------------- OpenWrt (LuCI: Services > MonoWordTest)
+  openwrt:
+    name: OpenWrt .ipk (opkg) and .apk (apk-tools)
+    runs-on: ubuntu-24.04
+    needs: [prepare]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with: { name: generated-files }
+      - name: Unpack generated files
+        shell: bash
+        run: tar xf generated.tar
+      - name: Version
+        id: ver
+        run: echo "v=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+      - name: Text-only ads for the router package
+        run: python3 tools/build_ads.py --text-only --out ads.text.js
+      - name: .ipk (OpenWrt 24.10 and older)
+        run: sudo MWT_URL="https://github.com/${{ github.repository }}" sh openwrt/build.sh ipk "${{ steps.ver.outputs.v }}" out
+      - name: Check .ipk contents
+        run: |
+          f=$(ls out/*.ipk); mkdir chk && tar xzf "$f" -C chk
+          tar tzf chk/control.tar.gz; tar tzf chk/data.tar.gz | grep -E 'menu.d|main.js|index.html'
+      - name: .apk (OpenWrt 25.12 and newer), built with Alpine's apk-tools 3
+        continue-on-error: true
+        run: |
+          docker run --rm -v "$PWD:/w" -w /w -e MWT_URL="https://github.com/${{ github.repository }}" alpine:edge \
+            sh -c 'apk add --no-cache apk-tools >/dev/null && apk --version && sh openwrt/build.sh apk "$1" out && apk adbdump out/*.apk' sh "${{ steps.ver.outputs.v }}"
+      - uses: actions/upload-artifact@v7
+        with:
+          retention-days: 3
+          name: MonoWordTest-openwrt
+          path: |
+            out/*.ipk
+            out/*.apk
+
+  # ---------------------------------------------------------------- Android
+  android:
+    name: Android .apk (Capacitor)
+    runs-on: ubuntu-24.04
+    needs: [prepare]
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with: { name: generated-files }
+      - name: Unpack generated files
+        shell: bash
+        run: tar xf generated.tar
+      - uses: actions/setup-node@v7
+        with: { node-version: '${{ env.NODE_VERSION }}' }
+      - uses: actions/setup-java@v5
+        with: { distribution: temurin, java-version: '17' }
+      - name: Build debug-signed APK
+        run: |
+          set -e
+          VER=$(node -p "require('./package.json').version")
+          mkdir www && sh tools/stage_web.sh www
+          npm install --no-save --no-audit --no-fund @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 @capacitor/app@6
+          npx cap init MonoWordTest io.github.monowordtest --web-dir=www
+          npx cap add android
+          sudo apt-get update -qq && sudo apt-get install -y python3-pil
+          python3 tools/make_icons.py --android android/app/src/main/res
+          grep -q 'android:icon="@mipmap/ic_launcher"' android/app/src/main/AndroidManifest.xml || { echo "manifest does not use @mipmap/ic_launcher"; exit 1; }
+          # our MainActivity adds window.MWTAndroid.exit() for the Exit button
+          JAVA_DIR=android/app/src/main/java/io/github/monowordtest
+          [ -f "$JAVA_DIR/MainActivity.java" ] || { echo "MainActivity.java not where expected:"; find android/app/src/main/java -name '*.java'; exit 1; }
+          cp android-extra/MainActivity.java "$JAVA_DIR/MainActivity.java"
+          npx cap sync android
+          for f in index.html dictionary.js about.js ads.js sounds.js; do
+            test -s "android/app/src/main/assets/public/$f" || { echo "missing in the app assets: $f"; exit 1; }
+          done
+          (cd android && chmod +x gradlew && ./gradlew assembleDebug)
+          mkdir out
+          cp android/app/build/outputs/apk/debug/app-debug.apk "out/MonoWordTest-${VER}-android.apk"
+      - uses: actions/upload-artifact@v7
+        with: { retention-days: 3, name: MonoWordTest-android, path: out/*.apk }
+
+  # ---------------------------------------------------------------- GitHub Release (tags only)
+  release:
+    name: Attach everything to the GitHub Release
+    if: ${{ !cancelled() && startsWith(github.ref, 'refs/tags/v') }}
+    needs: [prepare, web, win-modern, win-legacy, win-msi, win-xp, macos, linux, linux-snap, linux-flatpak, openwrt, android]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: MonoWordTest-*
+          merge-multiple: true
+          path: release
+      - run: ls -la release
+      - uses: softprops/action-gh-release@v3
+        with:
+          files: release/*
+          generate_release_notes: true
