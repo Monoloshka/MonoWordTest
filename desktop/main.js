@@ -24,11 +24,12 @@ let parsed=parseArgs(argsFromProcess());
 if(parsed.opts.help){fs.writeSync(1,helpText(version));process.exit(0);}
 if(parsed.opts.version){fs.writeSync(1,'MonoWordTest '+version+'\n');process.exit(0);}
 if(parsed.errors.length){fs.writeSync(2,parsed.errors.map(x=>'monowordtest: '+x).join('\n')+'\nTry --help for usage.\n');process.exit(2);}
+if(parsed.opts.noimage){const ses=require('electron').session; ses.defaultSession.webRequest.onBeforeRequest({urls:['*://*/*','file://*/*']},(details,callback)=>{callback({cancel:details.resourceType==='image'});});}
 const lock=app.requestSingleInstanceLock();
 if(!lock){app.quit();}
 const log=createLogger({file:parsed.opts.log,tty:!!process.stderr.isTTY});
 let nativeLangs=null,language={code:parsed.opts.lang,text:null},openedFiles=[],mainWindow=null;
-try{const dir=process.env.MWT_LOCALE_DIR||(process.env.FLATPAK_ID?'/app/share/locale':'');if(dir)nativeLangs=loadLangs(dir);}catch(e){log.warn('locale load failed:',e.message);}
+try{const dir=process.env.MWT_LOCALE_DIR||(process.env.FLATPAK_ID?'/app/share/locale':path.join(app.getAppPath(),'build','locale'));if(dir)nativeLangs=loadLangs(dir);}catch(e){log.warn('locale load failed:',e.message);}
 try{language=readLanguage(parsed.opts.lang);}catch(e){log.warn('--lang:',e.message);language={code:null,text:null};}
 ipcMain.on('mwt-langs',event=>{event.returnValue=nativeLangs;});
 ipcMain.on('mwt-cli-options',event=>{event.returnValue={noimage:parsed.opts.noimage,nosound:parsed.opts.nosound,nokeyboard:parsed.opts.nokeyboard,nomouse:parsed.opts.nomouse,font:cleanFontName(parsed.opts.font),lang:language.code,langText:language.text,initialOpen:parsed.opts.open.length>0};});
@@ -111,6 +112,10 @@ if(lock){
 }
 app.on('window-all-closed',()=>app.quit());
 let closing=false;
+// Ctrl+C in a terminal delivers SIGINT to the foreground process group. Route it through
+// Electron's normal quit path so the window and diagnostic log are closed cleanly.
+process.on('SIGINT',()=>{if(!closing)app.quit();});
+process.on('SIGTERM',()=>{if(!closing)app.quit();});
 app.on('before-quit',event=>{
  if(closing)return;
  event.preventDefault();closing=true;
