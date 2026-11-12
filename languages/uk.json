@@ -66,7 +66,9 @@
       "Support the author (voluntary donations)": "Підтримати автора (добровільні пожертви)",
       "Social networks and profiles": "Соціальні мережі та профілі",
       "Tap a number to copy it.": "Натисніть на номер, щоб скопіювати.",
-      "Copied": "Скопійовано"
+      "Copied": "Скопійовано",
+      "Random (2–10)": "Випадково (2–10)",
+      "Not enough unique answers: {n} of {wanted}. Add more dictionary entries or choose fewer options.": "Недостатньо унікальних відповідей: {n} з {wanted}. Додайте записи до словника або виберіть менше варіантів."
     }
   }
 }

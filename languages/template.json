@@ -65,7 +65,9 @@
       "Support the author (voluntary donations)": "",
       "Social networks and profiles": "",
       "Tap a number to copy it.": "",
-      "Copied": ""
+      "Copied": "",
+      "Random (2–10)": "",
+      "Not enough unique answers: {n} of {wanted}. Add more dictionary entries or choose fewer options.": ""
     }
   }
 }

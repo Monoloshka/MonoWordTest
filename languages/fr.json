@@ -66,7 +66,9 @@
       "Support the author (voluntary donations)": "Soutenir l’auteur (dons volontaires)",
       "Social networks and profiles": "Réseaux sociaux et profils",
       "Tap a number to copy it.": "Touchez un numéro pour le copier.",
-      "Copied": "Copié"
+      "Copied": "Copié",
+      "Random (2–10)": "Aléatoire (2–10)",
+      "Not enough unique answers: {n} of {wanted}. Add more dictionary entries or choose fewer options.": "Pas assez de réponses uniques : {n} sur {wanted}. Ajoutez des entrées au dictionnaire ou choisissez moins de réponses."
     }
   }
 }
