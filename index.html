@@ -105,6 +105,7 @@
   body.dark #ctxMenu button:hover { background: #3a3835; }
 
   html.nomouse, html.nomouse * { pointer-events: none !important; -webkit-user-select: none !important; user-select: none !important; }
+  html.noimage img, html.noimage svg, html.noimage picture, html.noimage video[poster] { display: none !important; }
 
   /* phones / portrait: question on top, answers below */
   @media (max-width: 700px), (orientation: portrait) {
@@ -157,7 +158,7 @@
       <label for="count" data-i18n="Answer options:">Answer options:</label>
       <select id="count">
         <option>2</option><option>3</option><option selected>4</option><option>5</option>
-        <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option>
+        <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option value="random" data-i18n="Random (2–10)">Random (2–10)</option>
       </select>
     </div>
     <div class="setting">
@@ -225,7 +226,7 @@
   </div>
 
   <footer>
-    <a href="https://claude.com/product/overview" target="_blank" rel="noopener noreferrer" title="Claude" style="margin:4px">
+    <a href="https://claude.com/product/overview" target="_blank" rel="noopener noreferrer" title="https://claude.com/product/overview" style="margin:4px">
 <svg xmlns="http://www.w3.org/2000/svg" width="88" height="31" viewBox="0 0 88 31" role="img" aria-label="Claude" xmlns:c2pa="http://c2pa.org/manifest">
 <rect x="0.5" y="0.5" width="87" height="30" rx="3" fill="#faf9f5" stroke="#d6d3c8"/>
 <g transform="translate(5 7.13) scale(0.08125)">
@@ -234,7 +235,7 @@
 </g>
 </svg>
     </a>
-<a href="https://chatgpt.com/overview/" target="_blank" rel="noopener noreferrer" title="ChatGPT" style="margin:4px">
+<a href="https://chatgpt.com/overview/" target="_blank" rel="noopener noreferrer" title="https://chatgpt.com/overview/" style="margin:4px">
     <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="88" height="31" viewBox="0 0 88 31" role="img" aria-label="ChatGPT">
       <defs>
         <style>
@@ -740,7 +741,8 @@
     stopTimer();
     locked = false;
     addClass($('nextBtn'), 'hidden');
-    var wanted = parseInt($('count').value, 10) || 4;
+    var countValue = $('count').value;
+    var wanted = countValue === 'random' ? (2 + randInt(9)) : (parseInt(countValue, 10) || 4);
     var dir = $('dir').value;
     var idx = randInt(pairs.length), P = pairs[idx];
     var flip = (dir === 'ba') ? true : (dir === 'ab') ? false : (Math.random() < 0.5);
@@ -762,6 +764,13 @@
       if (used[key] || q === prompt) { continue; }   // no duplicates, no second "correct" answer
       used[key] = true;
       options.push(c);
+    }
+    if (options.length < wanted) {
+      stopTimer(); locked = true;
+      $('answers').innerHTML = '';
+      setStatus('Not enough unique answers: {n} of {wanted}. Add more dictionary entries or choose fewer options.', { n: options.length, wanted: wanted });
+      addClass($('nextBtn'), 'hidden');
+      return;
     }
     shuffle(options);
     round = { correct: correct, hadWrong: false };
@@ -1019,6 +1028,7 @@
     }
     saveSetting('lang', $('lang').value); applyLang();
   });
+  on($('langImportBtn'), 'click', function (e) { stopEvent(e); try { $('langFile').click(); } catch (err) {} });
   on($('langFile'), 'change', function () {
     var l = $('langFile').files;
     if (l && l.length) { importLangFiles(l); }
@@ -1092,6 +1102,11 @@
     if (moveFocus(el, dir)) { stopEvent(e); }
   });
 
+  /* Show the actual destination when hovering links, including About links. */
+  function refreshHrefTitles(root) { var scope = root || document, links = scope.querySelectorAll ? scope.querySelectorAll('a[href]') : []; for (var i = 0; i < links.length; i++) { links[i].setAttribute('title', links[i].href); } }
+  refreshHrefTitles(document);
+  if (window.MutationObserver) { new MutationObserver(function (records) { for (var ri = 0; ri < records.length; ri++) { for (var ni = 0; ni < records[ri].addedNodes.length; ni++) { var node = records[ri].addedNodes[ni]; if (node.nodeType === 1) { if (node.tagName === 'A' && node.href) node.title = node.href; refreshHrefTitles(node); } } } }).observe(document.documentElement, { childList: true, subtree: true }); }
+
   /* ---------- command-line options ---------- */
   function swallowKey(e) {
     if (e.ctrlKey || e.altKey || e.metaKey) { return; }
@@ -1105,6 +1120,7 @@
     if (CLI.font && /^[^"'\\;{}<>]{1,80}$/.test(CLI.font)) {
       document.body.style.fontFamily = '"' + CLI.font + '", Arial, Helvetica, sans-serif';
     }
+    if (CLI.noimage) { addClass(document.documentElement, 'noimage'); }
     if (CLI.nokeyboard) {
       var types = ['keydown', 'keyup', 'keypress'];
       for (var i = 0; i < types.length; i++) { window.addEventListener(types[i], swallowKey, true); }

@@ -35,7 +35,8 @@
       "sounds/*.mp3",
       "vendor/**",
       "desktop/*.js",
-      "build/icon.png"
+      "build/icon.png",
+      "build/locale/**"
     ],
     "compression": "maximum",
     "win": {
