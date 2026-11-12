@@ -341,7 +341,20 @@ jobs:
           JAVA_DIR=android/app/src/main/java/io/github/monowordtest
           [ -f "$JAVA_DIR/MainActivity.java" ] || { echo "MainActivity.java not where expected:"; find android/app/src/main/java -name '*.java'; exit 1; }
           cp android-extra/MainActivity.java "$JAVA_DIR/MainActivity.java"
+          cp android-extra/SecretActivity.java "$JAVA_DIR/SecretActivity.java"
           npx cap sync android
+          mkdir -p android/app/src/main/assets/public
+          cp android-extra/secret.html android/app/src/main/assets/public/secret.html
+          # Register the hidden, exported activity without adding a launcher icon.
+          python3 - <<'PYMANIFEST'
+          from pathlib import Path
+          p = Path("android/app/src/main/AndroidManifest.xml")
+          s = p.read_text()
+          entry = '        <activity android:name=".SecretActivity" android:exported="true" android:label="Secret" />\n'
+          if ".SecretActivity" not in s:
+              s = s.replace("    </application>", entry + "    </application>")
+          p.write_text(s)
+          PYMANIFEST
           for f in index.html dictionary.js about.js ads.js sounds.js; do
             test -s "android/app/src/main/assets/public/$f" || { echo "missing in the app assets: $f"; exit 1; }
           done
