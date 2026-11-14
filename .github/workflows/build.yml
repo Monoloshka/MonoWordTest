@@ -240,10 +240,29 @@ jobs:
         with: { node-version: '${{ env.NODE_VERSION }}' }
       - name: Icons (all sizes from build/icon.png)
         run: sudo apt-get update -qq && sudo apt-get install -y python3-pil && python3 tools/make_icons.py
-      - run: sudo snap install snapcraft --classic
-      - run: npm install --no-audit --no-fund
-      - run: npx electron-builder --linux snap --x64 --publish never
-      - uses: actions/upload-artifact@v7
+      # The Snap Store is sometimes unreachable from the runners ("error: unable to contact snap store").
+      # So: wait for snapd, retry with growing pauses, and if it is still down skip the snap instead of failing the run.
+      - name: Install snapcraft (with retries)
+        id: snapcraft
+        shell: bash
+        run: |
+          sudo snap wait system seed.loaded || true
+          for attempt in 1 2 3 4 5 6 7 8; do
+            if sudo snap install snapcraft --classic; then exit 0; fi
+            echo "snap install failed (attempt $attempt of 8)"
+            [ "$attempt" = 8 ] && break
+            sudo systemctl restart snapd || true
+            sudo snap wait system seed.loaded || true
+            sleep $((attempt * 15))
+          done
+          echo "::warning::Snap Store unreachable - the .snap was skipped in this run (re-run the job later)"
+          echo "ok=false" >> "$GITHUB_OUTPUT"
+      - if: steps.snapcraft.outputs.ok != 'false'
+        run: npm install --no-audit --no-fund
+      - if: steps.snapcraft.outputs.ok != 'false'
+        run: npx electron-builder --linux snap --x64 --publish never
+      - if: steps.snapcraft.outputs.ok != 'false'
+        uses: actions/upload-artifact@v7
         with: { retention-days: 3, name: MonoWordTest-linux-snap, path: 'dist/*.snap' }
 
   linux-flatpak:
@@ -340,17 +359,19 @@ jobs:
           # our MainActivity adds window.MWTAndroid.exit() for the Exit button
           JAVA_DIR=android/app/src/main/java/io/github/monowordtest
           [ -f "$JAVA_DIR/MainActivity.java" ] || { echo "MainActivity.java not where expected:"; find android/app/src/main/java -name '*.java'; exit 1; }
-          cp android-extra/MainActivity.java "$JAVA_DIR/MainActivity.java"
-          cp android-extra/SecretActivity.java "$JAVA_DIR/SecretActivity.java"
+          cp android-extra/MainActivity.java android-extra/SecretActivity.java android-extra/AppProcess.java "$JAVA_DIR/"
           npx cap sync android
           mkdir -p android/app/src/main/assets/public
           cp android-extra/secret.html android/app/src/main/assets/public/secret.html
+          # languages/*.json become built-in languages of the Android app (window.MWT_NATIVE_LANGS)
+          python3 tools/build_android_langs.py android/app/src/main/assets/public
           # Register the hidden, exported activity without adding a launcher icon.
           python3 - <<'PYMANIFEST'
           from pathlib import Path
           p = Path("android/app/src/main/AndroidManifest.xml")
           s = p.read_text()
-          entry = '        <activity android:name=".SecretActivity" android:exported="true" android:label="Secret" />\n'
+          # own (empty) task affinity: SecretActivity never shares a task with the game, so Exit cannot reveal it
+          entry = '        <activity android:name=".SecretActivity" android:exported="true" android:label="Secret" android:taskAffinity="" />\n'
           if ".SecretActivity" not in s:
               s = s.replace("    </application>", entry + "    </application>")
           p.write_text(s)
