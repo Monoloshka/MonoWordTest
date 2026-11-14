@@ -201,5 +201,11 @@ msgstr ""
 msgid "Copied"
 msgstr ""
 
+msgid "Random (2–10)"
+msgstr ""
+
+msgid "Not enough unique answers: {n} of {wanted}. Add more dictionary entries or choose fewer options."
+msgstr ""
+
 msgid "Made with the help of Claude (claude.ai)"
 msgstr ""

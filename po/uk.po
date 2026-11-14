@@ -201,5 +201,11 @@ msgstr "Натисніть на номер, щоб скопіювати."
 msgid "Copied"
 msgstr "Скопійовано"
 
+msgid "Random (2–10)"
+msgstr "Випадково (2–10)"
+
+msgid "Not enough unique answers: {n} of {wanted}. Add more dictionary entries or choose fewer options."
+msgstr "Недостатньо унікальних відповідей: {n} з {wanted}. Додайте записи до словника або виберіть менше варіантів."
+
 msgid "Made with the help of Claude (claude.ai)"
 msgstr ""

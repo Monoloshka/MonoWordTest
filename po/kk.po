@@ -201,5 +201,11 @@ msgstr "Көшіру үшін нөмірді басыңыз."
 msgid "Copied"
 msgstr "Көшірілді"
 
+msgid "Random (2–10)"
+msgstr "Кездейсоқ (2–10)"
+
+msgid "Not enough unique answers: {n} of {wanted}. Add more dictionary entries or choose fewer options."
+msgstr "Бірегей жауаптар жеткіліксіз: {n}/{wanted}. Сөздікке жазбалар қосыңыз немесе жауап нұсқаларын азайтыңыз."
+
 msgid "Made with the help of Claude (claude.ai)"
 msgstr ""

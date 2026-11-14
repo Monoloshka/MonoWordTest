@@ -331,7 +331,7 @@
   /* ---------- i18n ----------
      The app contains only English. More languages come from (1) the gettext catalogues of a Flatpak
      (MWT_NATIVE_LANGS, supplied by the Electron wrapper) and (2) .json language files the user imports
-     (kept in localStorage). Several entries with the same language code are listed as "Name", "Name (2)", ... */
+     (kept in localStorage). Several entries with the same language code are listed as "Name", "Name (1)", "Name (2)", ... */
   var CODE_RE = /^[A-Za-z]{2,3}([-_][A-Za-z0-9]{2,8})*$/;
   function cleanLang(code, L) {
     if (!L || typeof L !== 'object' || !CODE_RE.test(String(code))) { return null; }
@@ -365,7 +365,7 @@
       var e = list[i], c = e.code;
       counts[c] = (counts[c] || 0) + 1;
       e.id = counts[c] === 1 ? c : c + '#' + counts[c];
-      e.label = (e.flag ? e.flag + ' ' : '') + e.name + (counts[c] > 1 ? ' (' + counts[c] + ')' : '');
+      e.label = (e.flag ? e.flag + ' ' : '') + e.name + (counts[c] > 1 ? ' (' + (counts[c] - 1) + ')' : '');   // 2nd entry of a code: "Name (1)"
       LANGBY[e.id] = e;
     }
     LANGLIST = list;
@@ -457,9 +457,7 @@
         try {
           var found = langsFromData(JSON.parse(String(r.result).replace(/^\uFEFF/, '')));
           for (var i = 0; i < found.length; i++) {
-            var sig = JSON.stringify([found[i].code, found[i].name, found[i].strings]), dup = false;
-            for (var j = 0; j < imported.length; j++) { if (JSON.stringify([imported[j].code, imported[j].name, imported[j].strings]) === sig) { dup = true; break; } }
-            if (!dup && imported.length < 300) { imported.push(found[i]); added.push(found[i]); }
+            if (imported.length < 300) { imported.push(found[i]); added.push(found[i]); }   // same language again: listed as "Name (1)", "Name (2)" ...
           }
         } catch (err) { /* not valid JSON: skipped */ }
         next();
@@ -786,7 +784,7 @@
     var b = document.createElement('button');
     b.type = 'button';
     b.className = 'ans';
-    setText(b, (index < 9 ? index + 1 : 0) + '. ' + text);     // keys 1-9, the 10th answer is key 0
+    setText(b, (index + 1) + '. ' + text);     // shown as 1 ... 10; the keyboard shortcut for the 10th answer is still key 0
     on(b, 'click', function () {
       if (locked || hasClass(b, 'wrong')) { return; }
       if (text === round.correct) {

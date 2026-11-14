@@ -20,6 +20,6 @@ File format (UTF-8 JSON). One file may hold one or several languages:
 To make a new language: copy template.json, rename it (e.g. it.json), change "xx" to the language code,
 fill in name, flag and the right-hand sides.
 
-Several files with the same language code are allowed: they appear as "Русский", "Русский (2)", "Русский (3)" ...
-Importing exactly the same content twice is ignored.
+Several files with the same language code are allowed: they appear as "Русский", "Русский (1)", "Русский (2)" ...
+Importing the same language again simply adds another entry; "Remove imported languages" clears them all.
 In the Flatpak build these files are also compiled to gettext catalogues (python3 tools/make_po.py).
