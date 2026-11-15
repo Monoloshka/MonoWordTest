@@ -94,6 +94,7 @@
       "de",
       "fr",
       "es"
-    ]
+    ],
+    "afterPack": "tools/after-pack.js"
   }
 }

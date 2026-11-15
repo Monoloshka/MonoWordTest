@@ -267,3 +267,9 @@ Electron packages contain a whole Chromium (about 70-100 MB each); the Android A
 
 Do not run `.py` files with `sh` in a shell that has no header: `import sys` would be executed by ImageMagick's `import`
 (a screenshot tool) and writes a huge file called `sys`. The tools in `tools/` now carry a header that makes `sh tools/x.py` work.
+
+## Linux: launcher with --no-sandbox
+
+`tools/after-pack.js` (electron-builder `afterPack`) renames the real binary to `monowordtest.bin` and installs a small `monowordtest`
+launcher that starts it with `--no-sandbox` from the very beginning. Setting the switch later from `main.js` is too late: Chromium's sandbox
+stays half enabled, child processes fail with "Creating shared memory ... No such process", the window stays blank, and running as root aborts.
