@@ -163,8 +163,8 @@ jobs:
             set -e
             sudo apt-get update -qq && sudo apt-get install -y -qq python3-pil wine64
             python3 -c "from PIL import Image; Image.open('build/icon.png').convert('RGBA').save('app.ico', sizes=[(256,256),(128,128),(64,64),(48,48),(32,32),(16,16)])"
-            npm install --no-audit --no-fund --no-save rcedit
-            WINEDEBUG=-all node -e "require('rcedit')('$NW/nw.exe',{icon:'app.ico'}).then(()=>console.log('icon replaced'),e=>{console.error(e);process.exit(1)})"
+            npm install --no-audit --no-fund --no-save rcedit@5
+            WINEDEBUG=-all node -e "require('rcedit').rcedit('$NW/nw.exe',{icon:'app.ico'}).then(()=>console.log('icon replaced'),e=>{console.error(e);process.exit(1)})"
           ) || echo "::warning::could not replace the NW.js icon in MonoWordTest.exe"
           mv "$NW/nw.exe" "$NW/MonoWordTest.exe"
           mv "$NW" MonoWordTest-winxp-vista
