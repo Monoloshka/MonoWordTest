@@ -16,7 +16,14 @@ function underWine(){
 const wine=underWine();
 app.disableHardwareAcceleration();
 if(wine){app.commandLine.appendSwitch('no-sandbox');app.commandLine.appendSwitch('disable-gpu');}
-if(process.platform==='linux')app.commandLine.appendSwitch('no-sandbox');
+if(process.platform==='linux'){
+ app.commandLine.appendSwitch('no-sandbox');
+ // The game needs no GPU. Run without the SwiftShader/Vulkan GPU process (it crashes on some systems/VMs/live sessions)
+ // and without /dev/shm for shared memory (unusable on some systems).
+ app.commandLine.appendSwitch('disable-gpu');
+ app.commandLine.appendSwitch('disable-software-rasterizer');
+ app.commandLine.appendSwitch('disable-dev-shm-usage');
+}
 
 const version=require('../package.json').version;
 function argsFromProcess(){return process.argv.slice(app.isPackaged?1:2);}
@@ -54,6 +61,8 @@ function createWindow(){
  });
  mainWindow=win;
  win.once('ready-to-show',()=>win.show());
+ // never leave an invisible window if 'ready-to-show' does not arrive
+ setTimeout(()=>{if(!win.isDestroyed()&&!win.isVisible())win.show();},4000);
  win.loadFile(path.join(__dirname,'..','index.html'));
  win.webContents.setWindowOpenHandler(({url})=>{
   if(isWeb(url))shell.openExternal(url);else log.warn('blocked window.open to',url);
@@ -85,7 +94,10 @@ function createWindow(){
   if(level>=2)log.warn('page:',message,'('+source+':'+line+')');
   else if(level===1)log.debug('page:',message);
  });
- win.webContents.on('render-process-gone',(_e,details)=>log.error('renderer process gone:',details.reason,details.exitCode));
+ win.webContents.on('render-process-gone',(_e,details)=>{
+  log.error('renderer process gone:',details.reason,details.exitCode);
+  if(details.reason!=='clean-exit'&&!win.__mwtCrashReload&&!win.isDestroyed()){win.__mwtCrashReload=true;win.webContents.reload();}
+ });
  win.webContents.on('unresponsive',()=>log.warn('window is not responding'));
  win.on('closed',()=>{if(mainWindow===win)mainWindow=null;});
  win.webContents.on('context-menu',(_event,params)=>{
