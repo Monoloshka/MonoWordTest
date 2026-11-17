@@ -1017,6 +1017,8 @@
   on($('aboutBtn'), 'click', function () { playSound('about'); showAbout(); });
   on($('backBtn'), 'click', function () { playSound('back'); showMenu(); });
   on($('exitBtn'), 'click', exitApp);
+  // iOS apps must not close themselves (the system does not allow it), so there is no Exit button on iPhone/iPad
+  try { var C0 = window.Capacitor; if (C0 && C0.getPlatform && C0.getPlatform() === 'ios') { $('exitBtn').style.display = 'none'; } } catch (e) { }
   on($('toMenuBtn'), 'click', function () { playSound('menu'); showMenu(); });
   on($('nextBtn'), 'click', function () { if (locked) { newRound(); } });
   on($('lang'), 'change', function () {

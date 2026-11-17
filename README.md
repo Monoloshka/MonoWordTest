@@ -291,3 +291,13 @@ the CI puts the same file into the NW.js `nw.exe` (Windows XP/Vista build) with 
   (Firefox, Chromium ...). It works offline and needs no installation.
 * **KolibriOS, MenuetOS, AROS, Syllable** have no browser/runtime able to run this program, so there is no build for them.
 * Electron has no official FreeBSD/OpenBSD/DragonFly builds, so there are no native packages for them either.
+
+## iPhone / iPad (experimental, manual build)
+
+Actions tab -> **Build iOS (unsigned .ipa)** -> Run workflow (it never runs automatically and does not touch the other builds).
+The result is an **unsigned** `.ipa`. iOS only runs signed apps, so it can be used in one of these ways:
+* sideload it with AltStore / Sideloadly / similar tools using your own Apple ID (the signature lasts 7 days with a free account);
+* TrollStore on supported iOS versions;
+* the App Store / TestFlight need a paid Apple Developer account and signing certificates, which this workflow does not contain.
+
+There is no Exit button on iOS (apps cannot close themselves there). The Android-only parts (SecretActivity) do not exist on iOS.
