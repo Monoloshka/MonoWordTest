@@ -4,7 +4,7 @@
 import os, sys, json
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DIR = os.path.join(ROOT, 'sounds')
-EVENTS = ('correct', 'wrong', 'start', 'builtin', 'menu', 'exit')
+EVENTS = ('correct', 'wrong', 'start', 'builtin', 'menu', 'exit', 'about', 'back')
 out = {}
 with open(os.path.join(DIR, 'sounds.txt'), encoding='utf-8-sig') as f:
     for n, line in enumerate(f, 1):

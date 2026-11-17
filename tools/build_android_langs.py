@@ -4,6 +4,7 @@
 
   python3 tools/build_android_langs.py <app-assets-dir>
 
+Also writes <dir>/secret-i18n.js (translations of the SecretActivity page).
 Writes <dir>/native-langs.js (window.MWT_NATIVE_LANGS = {...}) and adds a <script> tag for it to <dir>/index.html
 (right before the main script). The same MWT_NATIVE_LANGS hook is used by the Flatpak build, so the page treats these
 languages as built-in: they are not removed by "Remove imported languages", and importing the same language again
@@ -25,6 +26,10 @@ if not langs:
     sys.exit('no languages found')
 text = json.dumps(langs, ensure_ascii=False).replace('</', '<\\/')
 open(os.path.join(dest, 'native-langs.js'), 'w', encoding='utf-8', newline='\n').write('window.MWT_NATIVE_LANGS = ' + text + ';\n')
+# the hidden SecretActivity page is translated from the same files (key = its English text)
+SECRET = 'Oh, you found the secret page!'
+secret = {c: L['strings'][SECRET] for c, L in langs.items() if L['strings'].get(SECRET)}
+open(os.path.join(dest, 'secret-i18n.js'), 'w', encoding='utf-8', newline='\n').write('window.MWT_SECRET = ' + json.dumps(secret, ensure_ascii=False) + ';\n')
 idx = os.path.join(dest, 'index.html')
 html = open(idx, encoding='utf-8').read()
 marker = '<script>\n/* MonoWordTest - plain ES5'
