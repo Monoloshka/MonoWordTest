@@ -68,7 +68,8 @@
       "Tap a number to copy it.": "Көшіру үшін нөмірді басыңыз.",
       "Copied": "Көшірілді",
       "Random (2–10)": "Кездейсоқ (2–10)",
-      "Not enough unique answers: {n} of {wanted}. Add more dictionary entries or choose fewer options.": "Бірегей жауаптар жеткіліксіз: {n}/{wanted}. Сөздікке жазбалар қосыңыз немесе жауап нұсқаларын азайтыңыз."
+      "Not enough unique answers: {n} of {wanted}. Add more dictionary entries or choose fewer options.": "Бірегей жауаптар жеткіліксіз: {n}/{wanted}. Сөздікке жазбалар қосыңыз немесе жауап нұсқаларын азайтыңыз.",
+      "Oh, you found the secret page!": "О, сіз құпия бетті таптыңыз!"
     }
   }
 }

@@ -60,7 +60,7 @@
       "Author app Monoloshka (Dmitriy Yakovenko)": "Auteur de l’application Monoloshka (Dmitriy Yakovenko)",
       "Project page on GitHub": "Page du projet sur GitHub",
       "Report a problem": "Signaler un problème",
-      "Made with the help of Claude (claude.ai)": "Créé avec l’aide de Claude",
+      "Made with the help of Claude": "Créé avec l’aide de Claude",
       "Modified by ChatGPT": "Modifié par ChatGPT",
       "Thank you for playing!": "Merci d’avoir joué !",
       "Support the author (voluntary donations)": "Soutenir l’auteur (dons volontaires)",
@@ -68,7 +68,8 @@
       "Tap a number to copy it.": "Touchez un numéro pour le copier.",
       "Copied": "Copié",
       "Random (2–10)": "Aléatoire (2–10)",
-      "Not enough unique answers: {n} of {wanted}. Add more dictionary entries or choose fewer options.": "Pas assez de réponses uniques : {n} sur {wanted}. Ajoutez des entrées au dictionnaire ou choisissez moins de réponses."
+      "Not enough unique answers: {n} of {wanted}. Add more dictionary entries or choose fewer options.": "Pas assez de réponses uniques : {n} sur {wanted}. Ajoutez des entrées au dictionnaire ou choisissez moins de réponses.",
+      "Oh, you found the secret page!": "Oh, vous avez trouvé la page secrète !"
     }
   }
 }

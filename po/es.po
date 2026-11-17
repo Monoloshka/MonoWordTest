@@ -210,5 +210,5 @@ msgstr "No hay suficientes respuestas únicas: {n} de {wanted}. Añade entradas 
 msgid "Oh, you found the secret page!"
 msgstr "¡Oh, has encontrado la página secreta!"
 
-msgid "Made with the help of Claude (claude.ai)"
+msgid "Made with the help of Claude"
 msgstr ""

@@ -210,5 +210,5 @@ msgstr "Недостатньо унікальних відповідей: {n} з
 msgid "Oh, you found the secret page!"
 msgstr "О, ви знайшли секретну сторінку!"
 
-msgid "Made with the help of Claude (claude.ai)"
+msgid "Made with the help of Claude"
 msgstr ""

@@ -210,5 +210,5 @@ msgstr ""
 msgid "Oh, you found the secret page!"
 msgstr ""
 
-msgid "Made with the help of Claude (claude.ai)"
+msgid "Made with the help of Claude"
 msgstr ""

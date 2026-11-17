@@ -210,5 +210,5 @@ msgstr "Nicht genügend eindeutige Antworten: {n} von {wanted}. Fügen Sie Wört
 msgid "Oh, you found the secret page!"
 msgstr "Oh, du hast die Geheimseite gefunden!"
 
-msgid "Made with the help of Claude (claude.ai)"
+msgid "Made with the help of Claude"
 msgstr ""

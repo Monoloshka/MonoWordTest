@@ -16,7 +16,8 @@ public class SecretActivity extends Activity {
         super.onCreate(savedInstanceState);
         AppProcess.created();
         WebView web = new WebView(this);
-        web.getSettings().setJavaScriptEnabled(false);
+        web.getSettings().setJavaScriptEnabled(true);   // only for picking the translated text of the local page
+        web.getSettings().setBlockNetworkLoads(true);   // the page is fully local; links are handled in handle()
         web.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {

@@ -1,5 +1,5 @@
 'use strict';
-const {app,BrowserWindow,Menu,ipcMain,shell}=require('electron');
+const {app,BrowserWindow,Menu,ipcMain,shell,nativeTheme}=require('electron');
 const path=require('path'),fs=require('fs');
 const {execFileSync}=require('child_process');
 const {loadLangs}=require('./mo');
@@ -31,7 +31,11 @@ let parsed=parseArgs(argsFromProcess());
 if(parsed.opts.help){fs.writeSync(1,helpText(version));process.exit(0);}
 if(parsed.opts.version){fs.writeSync(1,'MonoWordTest '+version+'\n');process.exit(0);}
 if(parsed.errors.length){fs.writeSync(2,parsed.errors.map(x=>'monowordtest: '+x).join('\n')+'\nTry --help for usage.\n');process.exit(2);}
-if(parsed.opts.noimage){const ses=require('electron').session; ses.defaultSession.webRequest.onBeforeRequest({urls:['*://*/*','file://*/*']},(details,callback)=>{callback({cancel:details.resourceType==='image'});});}
+function installNoImage(){   // session.defaultSession exists only after the app is ready
+ if(!parsed.opts.noimage)return;
+ require('electron').session.defaultSession.webRequest.onBeforeRequest({urls:['*://*/*','file://*/*']},(details,callback)=>{callback({cancel:details.resourceType==='image'});});
+}
+const t0=Date.now();
 const lock=app.requestSingleInstanceLock();
 if(!lock){app.quit();}
 const log=createLogger({file:parsed.opts.log,tty:!!process.stderr.isTTY});
@@ -55,14 +59,14 @@ async function collectTargets(targets){
 function isWeb(url){return /^https?:\/\//i.test(url);}
 function createWindow(){
  const win=new BrowserWindow({
-  width:960,height:680,minWidth:360,minHeight:480,show:false,autoHideMenuBar:true,title:'MonoWordTest',
+  width:960,height:680,minWidth:360,minHeight:480,show:false,autoHideMenuBar:true,title:'MonoWordTest',backgroundColor:nativeTheme.shouldUseDarkColors?'#1f1e1d':'#f4f3ee',
   icon:path.join(__dirname,'..','build','icon.png'),
   webPreferences:{contextIsolation:true,nodeIntegration:false,devTools:false,preload:path.join(__dirname,'preload.js')}
  });
  mainWindow=win;
- win.once('ready-to-show',()=>win.show());
- // never leave an invisible window if 'ready-to-show' does not arrive
- setTimeout(()=>{if(!win.isDestroyed()&&!win.isVisible())win.show();},4000);
+ win.once('ready-to-show',()=>{log.info('first paint after',Date.now()-t0,'ms');win.show();});
+ // never leave an invisible window if 'ready-to-show' does not arrive (the window is already painted in the theme colour, not white)
+ setTimeout(()=>{if(!win.isDestroyed()&&!win.isVisible())win.show();},15000);
  win.loadFile(path.join(__dirname,'..','index.html'));
  win.webContents.setWindowOpenHandler(({url})=>{
   if(isWeb(url))shell.openExternal(url);else log.warn('blocked window.open to',url);
@@ -117,6 +121,8 @@ if(lock){
  app.whenReady().then(async()=>{
   // Do not expose a DevTools menu or accelerator in release builds.
   Menu.setApplicationMenu(null);
+  installNoImage();
+  log.info('app ready after',Date.now()-t0,'ms');
   if(parsed.opts.open.length)await collectTargets(parsed.opts.open);
   createWindow();
   app.on('activate',()=>{if(BrowserWindow.getAllWindows().length===0)createWindow();});

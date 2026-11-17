@@ -68,7 +68,8 @@
       "Tap a number to copy it.": "Toca un número para copiarlo.",
       "Copied": "Copiado",
       "Random (2–10)": "Aleatorio (2–10)",
-      "Not enough unique answers: {n} of {wanted}. Add more dictionary entries or choose fewer options.": "No hay suficientes respuestas únicas: {n} de {wanted}. Añade entradas al diccionario o elige menos opciones."
+      "Not enough unique answers: {n} of {wanted}. Add more dictionary entries or choose fewer options.": "No hay suficientes respuestas únicas: {n} de {wanted}. Añade entradas al diccionario o elige menos opciones.",
+      "Oh, you found the secret page!": "¡Oh, has encontrado la página secreta!"
     }
   }
 }

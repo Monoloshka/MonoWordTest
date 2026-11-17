@@ -60,14 +60,15 @@
       "Author app Monoloshka (Dmitriy Yakovenko)": "",
       "Project page on GitHub": "",
       "Report a problem": "",
-      "Made with the help of Claude (claude.ai)": "",
+      "Made with the help of Claude": "",
       "Thank you for playing!": "",
       "Support the author (voluntary donations)": "",
       "Social networks and profiles": "",
       "Tap a number to copy it.": "",
       "Copied": "",
       "Random (2–10)": "",
-      "Not enough unique answers: {n} of {wanted}. Add more dictionary entries or choose fewer options.": ""
+      "Not enough unique answers: {n} of {wanted}. Add more dictionary entries or choose fewer options.": "",
+      "Oh, you found the secret page!": ""
     }
   }
 }
