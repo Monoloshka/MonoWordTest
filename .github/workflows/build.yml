@@ -161,8 +161,11 @@ jobs:
           # If this fails (e.g. wine cannot be installed) the zip is still built, just with the NW.js icon.
           (
             set -e
-            sudo apt-get update -qq && sudo apt-get install -y -qq python3-pil wine64
-            python3 -c "from PIL import Image; Image.open('build/icon.png').convert('RGBA').save('app.ico', sizes=[(256,256),(128,128),(64,64),(48,48),(32,32),(16,16)])"
+            sudo apt-get update -qq && sudo apt-get install -y -qq wine64
+            cp build/icon.ico app.ico        # 16, 32, 48 and 256 px (tools/make_ico.py)
+            # rcedit calls a command named "wine64"; Ubuntu only installs "wine"
+            command -v wine64 >/dev/null || sudo ln -sf "$(command -v wine || echo /usr/lib/wine/wine64)" /usr/local/bin/wine64
+            export WINEPREFIX="$RUNNER_TEMP/wineprefix" WINEARCH=win64
             npm install --no-audit --no-fund --no-save rcedit@5
             WINEDEBUG=-all node -e "require('rcedit').rcedit('$NW/nw.exe',{icon:'app.ico'}).then(()=>console.log('icon replaced'),e=>{console.error(e);process.exit(1)})"
           ) || echo "::warning::could not replace the NW.js icon in MonoWordTest.exe"
