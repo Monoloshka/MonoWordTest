@@ -1,5 +1,5 @@
 # event | mp3 file (in this folder).  Only .mp3. One file may be used for several events.
-# Events: correct, wrong, start, builtin, menu, exit
+# Events: correct, wrong, start, builtin, menu, exit, about, back
 # Leave an event out (or comment it with #) to keep it silent. No lines at all = the "Sound" option is hidden.
 # After editing run:  python3 tools/build_sounds.py
 # The three files here are tiny generated placeholders - replace them with your own.
@@ -9,3 +9,5 @@ start   | click.mp3
 builtin | click.mp3
 menu    | click.mp3
 exit    | click.mp3
+about   | click.mp3
+back    | click.mp3
