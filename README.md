@@ -36,7 +36,7 @@ and finally `python3 tools/build_single.py`) and commit the regenerated `MonoWor
 * **Next question:** automatically after N seconds, or by a **Next** button.
 * **Count correct and wrong answers** for the current session (from **Start** until **To menu**). A question counts once: wrong if a wrong
   answer was clicked first, otherwise correct.
-* **Sound:** `sounds/sounds.txt` maps events (`correct wrong start builtin menu exit`) to `.mp3` files, one file may serve several events.
+* **Sound:** `sounds/sounds.txt` maps events (`correct wrong start builtin menu exit about back`) to `.mp3` files, one file may serve several events.
   Run `python3 tools/build_sounds.py` after editing. The three included files are tiny generated placeholders. If no events are mapped the option is hidden.
 * **Exit** (closes the app) appears only in the standalone apps (Electron, NW.js, Android). It is hidden in a browser tab and on OpenWrt.
 * **About:** icon (`build/icon.png`), version (`package.json`), translated author line, project links, voluntary donation links and social profiles, from `about/about.txt`
@@ -69,7 +69,7 @@ and one file may hold several languages. Imported languages are remembered on th
 
 The language is chosen automatically from the system/browser locale (`navigator.languages`) among the available ones,
 otherwise English; the user can override it in the list (flag emoji + name). A string missing in a language is shown in English.
-If several entries share a language code they are listed as `Русский`, `Русский (1)`, `Русский (2)` ...
+If several entries share a language code they are listed as `Русский`, `Русский (2)`, `Русский (3)` ...
 (importing the same language again just adds another entry).
 
 **Add a language:** copy `languages/template.json`, rename it, set the language code, `name`, `flag` and fill in the right-hand side
@@ -263,7 +263,7 @@ Electron packages contain a whole Chromium (about 70-100 MB each); the Android A
 * `SecretActivity` (hidden, no launcher icon, own task affinity) shows `secret.html`; its lock links to
   `tg://resolve?domain=MonoloshkaMusicDatabase`, which is passed to Telegram. If Telegram is not installed nothing happens.
 * `tools/build_android_langs.py` makes `languages/*.json` built-in languages of the APK (they stay when
-  "Remove imported languages" is used). Importing a language file again adds `Name (1)`, `Name (2)` ...
+  "Remove imported languages" is used). Importing a language file again adds `Name (2)`, `Name (3)` ...
 
 Do not run `.py` files with `sh` in a shell that has no header: `import sys` would be executed by ImageMagick's `import`
 (a screenshot tool) and writes a huge file called `sys`. The tools in `tools/` now carry a header that makes `sh tools/x.py` work.
@@ -273,3 +273,21 @@ Do not run `.py` files with `sh` in a shell that has no header: `import sys` wou
 `tools/after-pack.js` (electron-builder `afterPack`) renames the real binary to `monowordtest.bin` and installs a small `monowordtest`
 launcher that starts it with `--no-sandbox` from the very beginning. Setting the switch later from `main.js` is too late: Chromium's sandbox
 stays half enabled, child processes fail with "Creating shared memory ... No such process", the window stays blank, and running as root aborts.
+
+## Zoom
+
+In the app builds (Electron, Android, NW.js) **Ctrl + mouse wheel** zooms the interface like a browser (50 % ... 300 %); **Ctrl +**, **Ctrl -** and **Ctrl 0** also work. The level is remembered.
+In a normal web browser the browser's own zoom is used.
+
+## Windows icon
+
+`build/icon.ico` holds exactly 16, 32, 48 and 256 px (16-48 as classic BMP entries, so Windows XP can read them; 256 as PNG).
+Regenerate it from `build/icon.png` with `python3 tools/make_ico.py` (needs Pillow). electron-builder uses it for the Windows `.exe`,
+the CI puts the same file into the NW.js `nw.exe` (Windows XP/Vista build) with rcedit.
+
+## Other systems
+
+* **FreeBSD, OpenBSD, DragonFly BSD, SliTaz, other Linux/Unix**: use the single file `MonoWordTest.html` in any modern browser
+  (Firefox, Chromium ...). It works offline and needs no installation.
+* **KolibriOS, MenuetOS, AROS, Syllable** have no browser/runtime able to run this program, so there is no build for them.
+* Electron has no official FreeBSD/OpenBSD/DragonFly builds, so there are no native packages for them either.

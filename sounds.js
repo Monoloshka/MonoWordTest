@@ -5,5 +5,7 @@ var MWT_SOUNDS = {
  "start": "sounds/click.mp3",
  "builtin": "sounds/click.mp3",
  "menu": "sounds/click.mp3",
- "exit": "sounds/click.mp3"
+ "exit": "sounds/click.mp3",
+ "about": "sounds/click.mp3",
+ "back": "sounds/click.mp3"
 };
