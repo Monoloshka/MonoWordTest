@@ -1,0 +1,79 @@
+name: Build iOS (unsigned .ipa)
+
+# Separate from "Build packages": it never runs on pushes or tags, only when you press the button
+# (Actions tab -> "Build iOS (unsigned .ipa)" -> Run workflow). Needs a macOS runner (free for public repositories).
+# The .ipa is NOT signed: it cannot be installed on an iPhone as it is, see the notes in README.md.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: '22'
+
+jobs:
+  ios:
+    name: iOS .ipa (Capacitor, unsigned)
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with: { node-version: '${{ env.NODE_VERSION }}' }
+
+      - name: Generate dictionary.js, ads.js, about.js, sounds.js from the sources
+        run: |
+          set -e
+          python3 -m venv .venv && . .venv/bin/activate && pip install --quiet pillow
+          python3 tools/build_all.py
+
+      - name: Create the iOS project
+        run: |
+          set -e
+          VER=$(node -p "require('./package.json').version")
+          mkdir www && sh tools/stage_web.sh www
+          # languages/*.json become built-in languages (same mechanism as the Android app)
+          python3 tools/build_android_langs.py www
+          npm install --no-save --no-audit --no-fund @capacitor/core@6 @capacitor/cli@6 @capacitor/ios@6 @capacitor/app@6
+          npx cap init MonoWordTest io.github.monowordtest --web-dir=www
+          npx cap add ios
+          npx cap sync ios
+          ls ios/App
+
+      - name: App icon (1024x1024, no transparency - required by iOS)
+        run: |
+          set -e
+          . .venv/bin/activate
+          SET=ios/App/App/Assets.xcassets/AppIcon.appiconset
+          [ -d "$SET" ] || { echo "icon set not found:"; find ios -name '*.appiconset'; exit 1; }
+          python3 - <<'PY'
+          from PIL import Image
+          src = Image.open('build/icon.png').convert('RGBA')
+          bg = Image.new('RGB', (1024, 1024), (255, 255, 255))
+          src = src.resize((1024, 1024), Image.LANCZOS)
+          bg.paste(src, (0, 0), src)
+          bg.save('ios/App/App/Assets.xcassets/AppIcon.appiconset/AppIcon-512@2x.png', 'PNG')
+          PY
+          cat "$SET/Contents.json"
+          /usr/libexec/PlistBuddy -c "Add :ITSAppUsesNonExemptEncryption bool false" ios/App/App/Info.plist || true
+
+      - name: Build (no code signing)
+        run: |
+          set -e
+          VER=$(node -p "require('./package.json').version")
+          cd ios/App
+          if [ -d App.xcworkspace ]; then TARGET="-workspace App.xcworkspace"; else TARGET="-project App.xcodeproj"; fi
+          xcodebuild $TARGET -scheme App -configuration Release -sdk iphoneos \
+            -destination 'generic/platform=iOS' -archivePath "$PWD/build/App.xcarchive" \
+            MARKETING_VERSION="$VER" CURRENT_PROJECT_VERSION=1 \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            archive | tail -40
+          APP=$(find build/App.xcarchive/Products/Applications -maxdepth 1 -name '*.app' | head -1)
+          [ -n "$APP" ] || { echo "no .app in the archive"; exit 1; }
+          rm -rf Payload && mkdir Payload && cp -R "$APP" Payload/
+          mkdir -p ../../out
+          zip -qry "../../out/MonoWordTest-${VER}-ios-unsigned.ipa" Payload
+          ls -la ../../out
+
+      - uses: actions/upload-artifact@v7
+        with: { retention-days: 3, name: MonoWordTest-ios-unsigned, path: out/*.ipa }
