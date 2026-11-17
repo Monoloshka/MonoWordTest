@@ -35,6 +35,7 @@ For more information, please refer to <https://unlicense.org>
 Not covered by the above (they have their own terms):
   - vendor/xlsx.full.min.js - SheetJS, Apache-2.0 (vendor/LICENSE-xlsx.txt)
   - the Claude name and logo - belong to Anthropic
+  - the chatGPT name and logo - belong to OpenAI
   - the contents of dictionary.txt - the word list is not written by this project's author;
     make sure you may redistribute your own dictionary file
   - Electron, Chromium, NW.js, Capacitor etc. inside the built packages - their own licenses
