@@ -207,5 +207,8 @@ msgstr "Случайный (2–10)"
 msgid "Not enough unique answers: {n} of {wanted}. Add more dictionary entries or choose fewer options."
 msgstr "Недостаточно уникальных ответов: {n} из {wanted}. Добавьте записи в словарь или выберите меньше вариантов."
 
+msgid "Oh, you found the secret page!"
+msgstr "О, вы нашли секретную страницу!"
+
 msgid "Made with the help of Claude (claude.ai)"
 msgstr ""
