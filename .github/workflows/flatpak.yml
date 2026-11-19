@@ -1,0 +1,46 @@
+name: Build Flatpak
+
+# Separate from "Build packages": it never runs on pushes or tags, only when you press the button
+# (Actions tab -> "Build Flatpak" -> Run workflow). The result is a downloadable artifact of that run.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: '22'
+
+jobs:
+  flatpak:
+    name: Linux .flatpak
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with: { node-version: '${{ env.NODE_VERSION }}' }
+
+      - name: Generate dictionary.js, ads.js, about.js, sounds.js, gettext catalogues and icons
+        run: |
+          set -e
+          sudo apt-get update -qq && sudo apt-get install -y -qq python3-pil
+          python3 tools/build_all.py
+          python3 tools/make_icons.py
+
+      - name: Install flatpak, flatpak-builder and the runtime (with retries)
+        shell: bash
+        run: |
+          set -e
+          sudo apt-get install -y -qq flatpak flatpak-builder elfutils
+          flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+          for attempt in 1 2 3 4; do
+            if flatpak install --user -y flathub org.freedesktop.Platform//24.08 org.freedesktop.Sdk//24.08 org.electronjs.Electron2.BaseApp//24.08; then exit 0; fi
+            echo "flatpak install failed (attempt $attempt of 4)"; sleep $((attempt * 20))
+          done
+          exit 1
+
+      - run: npm install --no-audit --no-fund
+      - run: npx electron-builder --linux flatpak --x64 --publish never
+
+      - uses: actions/upload-artifact@v7
+        with: { retention-days: 7, name: MonoWordTest-linux-flatpak, path: 'dist/*.flatpak' }

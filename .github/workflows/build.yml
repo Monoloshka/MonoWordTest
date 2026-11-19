@@ -277,32 +277,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with: { retention-days: 3, name: MonoWordTest-linux-snap, path: 'dist/*.snap' }
 
-  linux-flatpak:
-    name: Linux .flatpak (experimental)
-    runs-on: ubuntu-24.04
-    needs: [prepare]
-    continue-on-error: true
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/download-artifact@v8
-        with: { name: generated-files }
-      - name: Unpack generated files
-        shell: bash
-        run: tar xf generated.tar
-      - uses: actions/setup-node@v7
-        with: { node-version: '${{ env.NODE_VERSION }}' }
-      - name: Icons (all sizes from build/icon.png)
-        run: sudo apt-get update -qq && sudo apt-get install -y python3-pil && python3 tools/make_icons.py
-      - run: |
-          sudo apt-get update && sudo apt-get install -y flatpak flatpak-builder elfutils
-          flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-          flatpak install --user -y flathub org.freedesktop.Platform//24.08 org.freedesktop.Sdk//24.08 org.electronjs.Electron2.BaseApp//24.08
-      - run: npm install --no-audit --no-fund
-      - name: gettext catalogues for /app/share/locale
-        run: python3 tools/make_po.py
-      - run: npx electron-builder --linux flatpak --x64 --publish never
-      - uses: actions/upload-artifact@v7
-        with: { retention-days: 3, name: MonoWordTest-linux-flatpak, path: 'dist/*.flatpak' }
+  # Flatpak is built separately: .github/workflows/flatpak.yml (manual "Run workflow" button)
 
   # ---------------------------------------------------------------- OpenWrt (LuCI: Services > MonoWordTest)
   openwrt:
@@ -401,7 +376,7 @@ jobs:
   release:
     name: Attach everything to the GitHub Release
     if: ${{ !cancelled() && startsWith(github.ref, 'refs/tags/v') }}
-    needs: [prepare, web, win-modern, win-legacy, win-msi, win-xp, macos, linux, linux-snap, linux-flatpak, openwrt, android]
+    needs: [prepare, web, win-modern, win-legacy, win-msi, win-xp, macos, linux, linux-snap, openwrt, android]
     runs-on: ubuntu-24.04
     permissions:
       contents: write
