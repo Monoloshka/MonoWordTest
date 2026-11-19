@@ -16,6 +16,8 @@ exports.default = async function afterPack(context) {
   fs.writeFileSync(bin,
     '#!/bin/sh\n' +
     'HERE="$(dirname "$(readlink -f "$0")")"\n' +
+    '# Chromium prints harmless warnings (VA-API, histograms ...); only fatal messages are shown. MWT_VERBOSE=1 shows everything.\n' +
+    'if [ -n "$MWT_VERBOSE" ]; then set -- "$@"; else set -- --log-level=3 "$@"; fi\n' +
     'exec "$HERE/' + name + '.bin" --no-sandbox "$@"\n', { mode: 0o755 });
   fs.chmodSync(bin, 0o755);
 };

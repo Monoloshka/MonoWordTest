@@ -301,3 +301,13 @@ The result is an **unsigned** `.ipa`. iOS only runs signed apps, so it can be us
 * the App Store / TestFlight need a paid Apple Developer account and signing certificates, which this workflow does not contain.
 
 There is no Exit button on iOS (apps cannot close themselves there). The Android-only parts (SecretActivity) do not exist on iOS.
+
+## Flatpak (manual build)
+
+Actions tab -> **Build Flatpak** -> Run workflow (`.github/workflows/flatpak.yml`). It no longer runs with the other packages, so the `.flatpak`
+is not attached to GitHub Releases automatically: download it from the artifacts of that run.
+
+## Quiet console on Linux
+
+The Linux launcher (`tools/after-pack.js`) starts the app with `--log-level=3`, so Chromium's harmless warnings (VA-API, histograms)
+are not printed. Run with `MWT_VERBOSE=1 monowordtest` to see everything again.
