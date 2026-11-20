@@ -1,0 +1,23 @@
+name: Generate files from the sources
+description: >
+  Creates dictionary.js, ads.js, about.js, sounds.js, MonoWordTest.html and the gettext catalogues
+  (the committed copies are never trusted, so a forgotten regeneration cannot break a build).
+  Works on Linux, Windows and macOS runners. Run it after actions/checkout.
+runs:
+  using: composite
+  steps:
+    - name: Pillow
+      shell: bash
+      run: |
+        PY=$(command -v python3 || command -v python || command -v py)
+        "$PY" -m pip install --quiet --break-system-packages pillow || "$PY" -m pip install --quiet pillow
+    - name: Check language files are valid JSON
+      shell: bash
+      run: |
+        PY=$(command -v python3 || command -v python || command -v py)
+        "$PY" -c "import glob,json;[json.load(open(f,encoding='utf-8-sig')) for f in glob.glob('languages/*.json')];print('language files ok')"
+    - name: Generate everything
+      shell: bash
+      run: |
+        PY=$(command -v python3 || command -v python || command -v py)
+        "$PY" tools/build_all.py
