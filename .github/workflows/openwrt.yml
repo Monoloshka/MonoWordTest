@@ -1,0 +1,44 @@
+name: Build OpenWrt (.ipk, .apk)
+
+# Own button: Actions tab -> "Build OpenWrt (.ipk, .apk)" -> Run workflow.
+# The same file is also used by "Build packages" (all formats at once, tags -> GitHub Release).
+on:
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: '22'
+
+jobs:
+  openwrt:
+    name: OpenWrt .ipk (opkg) and .apk (apk-tools)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/generate
+      - name: Version
+        id: ver
+        run: echo "v=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+      - name: Text-only ads for the router package
+        run: python3 tools/build_ads.py --text-only --out ads.text.js
+      - name: .ipk (OpenWrt 24.10 and older)
+        run: sudo MWT_URL="https://github.com/${{ github.repository }}" sh openwrt/build.sh ipk "${{ steps.ver.outputs.v }}" out
+      - name: Check .ipk contents
+        run: |
+          f=$(ls out/*.ipk); mkdir chk && tar xzf "$f" -C chk
+          tar tzf chk/control.tar.gz; tar tzf chk/data.tar.gz | grep -E 'menu.d|main.js|index.html'
+      - name: .apk (OpenWrt 25.12 and newer), built with Alpine's apk-tools 3
+        continue-on-error: true
+        run: |
+          docker run --rm -v "$PWD:/w" -w /w -e MWT_URL="https://github.com/${{ github.repository }}" alpine:edge \
+            sh -c 'apk add --no-cache apk-tools >/dev/null && apk --version && sh openwrt/build.sh apk "$1" out && apk adbdump out/*.apk' sh "${{ steps.ver.outputs.v }}"
+      - uses: actions/upload-artifact@v7
+        with:
+          retention-days: 3
+          name: MonoWordTest-openwrt
+          path: |
+            out/*.ipk
+            out/*.apk

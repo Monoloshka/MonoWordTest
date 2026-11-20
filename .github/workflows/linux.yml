@@ -1,0 +1,40 @@
+name: Build Linux (AppImage, deb, rpm, pacman, tar.gz)
+
+# Own button: Actions tab -> "Build Linux (AppImage, deb, rpm, pacman, tar.gz)" -> Run workflow.
+# The same file is also used by "Build packages" (all formats at once, tags -> GitHub Release).
+on:
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: '22'
+
+jobs:
+  linux:
+    name: Linux AppImage, deb, rpm, pacman, tar.gz (${{ matrix.arch }})
+    runs-on: ubuntu-24.04
+    continue-on-error: ${{ matrix.arch == 'arm64' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x64, arm64]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/generate
+      - uses: actions/setup-node@v7
+        with: { node-version: '${{ env.NODE_VERSION }}' }
+      - name: Icons (all sizes from build/icon.png)
+        run: sudo apt-get update -qq && sudo apt-get install -y python3-pil && python3 tools/make_icons.py
+      - run: sudo apt-get update && sudo apt-get install -y rpm libarchive-tools
+      - run: npm install --no-audit --no-fund
+      - run: npx electron-builder --linux AppImage deb pacman tar.gz --${{ matrix.arch }} --publish never
+      - name: rpm (separate step so a failure cannot lose the other formats)
+        continue-on-error: true
+        run: |
+          npx electron-builder --linux rpm --${{ matrix.arch }} --publish never || \
+          npx electron-builder --linux rpm --${{ matrix.arch }} --publish never -c.rpm.compression=gzip
+      - uses: actions/upload-artifact@v7
+        with: { retention-days: 3, name: 'MonoWordTest-linux-${{ matrix.arch }}', path: 'dist/MonoWordTest-*' }

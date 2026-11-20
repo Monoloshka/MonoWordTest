@@ -1,0 +1,33 @@
+name: Build Windows 7/8/8.1 (portable .exe)
+
+# Own button: Actions tab -> "Build Windows 7/8/8.1 (portable .exe)" -> Run workflow.
+# The same file is also used by "Build packages" (all formats at once, tags -> GitHub Release).
+on:
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: '22'
+
+jobs:
+  win-legacy:
+    name: Windows 7/8/8.1 portable .exe (Electron 22)
+    runs-on: windows-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/generate
+      - uses: actions/setup-node@v7
+        with: { node-version: '${{ env.NODE_VERSION }}' }
+      - shell: bash
+        run: |
+          npm install --no-audit --no-fund
+          npm install --no-save --no-audit --no-fund electron@22.3.27   # last Electron that runs on Windows 7/8/8.1
+          npx electron-builder --win portable --x64 --ia32 --publish never \
+            -c.electronVersion=22.3.27 \
+            '-c.portable.artifactName=MonoWordTest-${version}-win7-8-8.1-${arch}-portable.${ext}'
+      - uses: actions/upload-artifact@v7
+        with: { retention-days: 3, name: MonoWordTest-win7-8-8.1, path: 'dist/MonoWordTest-*.exe' }

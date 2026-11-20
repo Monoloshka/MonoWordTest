@@ -1,0 +1,36 @@
+name: Build macOS (.app zip, .dmg, .pkg)
+
+# Own button: Actions tab -> "Build macOS (.app zip, .dmg, .pkg)" -> Run workflow.
+# The same file is also used by "Build packages" (all formats at once, tags -> GitHub Release).
+on:
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: '22'
+
+jobs:
+  macos:
+    name: macOS .app (zip), .dmg, .pkg
+    runs-on: macos-latest
+    continue-on-error: true
+    env:
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false'   # unsigned builds
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/generate
+      - uses: actions/setup-node@v7
+        with: { node-version: '${{ env.NODE_VERSION }}' }
+      - run: npm install --no-audit --no-fund
+      - run: npx electron-builder --mac zip dmg --x64 --arm64 --publish never
+      - name: .pkg x64 (optional)
+        continue-on-error: true
+        run: npx electron-builder --mac pkg --x64 --publish never
+      - name: .pkg arm64 (optional)
+        continue-on-error: true
+        run: npx electron-builder --mac pkg --arm64 --publish never
+      - uses: actions/upload-artifact@v7
+        with: { retention-days: 3, name: MonoWordTest-macos, path: 'dist/MonoWordTest-*.*' }

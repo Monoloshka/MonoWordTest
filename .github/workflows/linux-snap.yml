@@ -1,0 +1,50 @@
+name: Build Linux Snap
+
+# Own button: Actions tab -> "Build Linux Snap" -> Run workflow.
+# The same file is also used by "Build packages" (all formats at once, tags -> GitHub Release).
+on:
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: '22'
+
+jobs:
+  linux-snap:
+    name: Linux .snap (experimental)
+    runs-on: ubuntu-24.04
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/generate
+      - uses: actions/setup-node@v7
+        with: { node-version: '${{ env.NODE_VERSION }}' }
+      - name: Icons (all sizes from build/icon.png)
+        run: sudo apt-get update -qq && sudo apt-get install -y python3-pil && python3 tools/make_icons.py
+      # The Snap Store is sometimes unreachable from the runners ("error: unable to contact snap store").
+      # So: wait for snapd, retry with growing pauses, and if it is still down skip the snap instead of failing the run.
+      - name: Install snapcraft (with retries)
+        id: snapcraft
+        shell: bash
+        run: |
+          sudo snap wait system seed.loaded || true
+          for attempt in 1 2 3 4 5 6 7 8; do
+            if sudo snap install snapcraft --classic; then exit 0; fi
+            echo "snap install failed (attempt $attempt of 8)"
+            [ "$attempt" = 8 ] && break
+            sudo systemctl restart snapd || true
+            sudo snap wait system seed.loaded || true
+            sleep $((attempt * 15))
+          done
+          echo "::warning::Snap Store unreachable - the .snap was skipped in this run (re-run the job later)"
+          echo "ok=false" >> "$GITHUB_OUTPUT"
+      - if: steps.snapcraft.outputs.ok != 'false'
+        run: npm install --no-audit --no-fund
+      - if: steps.snapcraft.outputs.ok != 'false'
+        run: npx electron-builder --linux snap --x64 --publish never
+      - if: steps.snapcraft.outputs.ok != 'false'
+        uses: actions/upload-artifact@v7
+        with: { retention-days: 3, name: MonoWordTest-linux-snap, path: 'dist/*.snap' }

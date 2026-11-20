@@ -1,0 +1,75 @@
+name: Build Android (.apk)
+
+# Own button: Actions tab -> "Build Android (.apk)" -> Run workflow.
+# The same file is also used by "Build packages" (all formats at once, tags -> GitHub Release).
+on:
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: '22'
+
+jobs:
+  android:
+    name: Android .apk (Capacitor)
+    runs-on: ubuntu-24.04
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/generate
+      - uses: actions/setup-node@v7
+        with: { node-version: '${{ env.NODE_VERSION }}' }
+      - uses: actions/setup-java@v5
+        with: { distribution: temurin, java-version: '17' }
+      - name: Build debug-signed APK
+        run: |
+          set -e
+          VER=$(node -p "require('./package.json').version")
+          mkdir www && sh tools/stage_web.sh www
+          npm install --no-save --no-audit --no-fund @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 @capacitor/app@6
+          npx cap init MonoWordTest io.github.monowordtest --web-dir=www
+          npx cap add android
+          sudo apt-get update -qq && sudo apt-get install -y python3-pil
+          python3 tools/make_icons.py --android android/app/src/main/res
+          grep -q 'android:icon="@mipmap/ic_launcher"' android/app/src/main/AndroidManifest.xml || { echo "manifest does not use @mipmap/ic_launcher"; exit 1; }
+          # Pictures that Capacitor's template brings along and that are not ours:
+          #  - splash.png: Capacitor's own logo splash -> replaced by a plain background in the app's colour
+          #  - ic_launcher_foreground.png: Capacitor's launcher logo; our adaptive icon uses mwt_icon_foreground instead
+          RES=android/app/src/main/res
+          rm -f "$RES"/drawable*/splash.png
+          mkdir -p "$RES/drawable"
+          printf '%s\n' '<?xml version="1.0" encoding="utf-8"?>' \
+            '<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">' \
+            '    <solid android:color="#F4F3EE"/>' '</shape>' > "$RES/drawable/splash.xml"
+          if ! grep -rqs 'ic_launcher_foreground' "$RES" --include='*.xml'; then rm -f "$RES"/mipmap-*/ic_launcher_foreground.png; else echo "ic_launcher_foreground is still referenced, kept"; fi
+          # our MainActivity adds window.MWTAndroid.exit() for the Exit button
+          JAVA_DIR=android/app/src/main/java/io/github/monowordtest
+          [ -f "$JAVA_DIR/MainActivity.java" ] || { echo "MainActivity.java not where expected:"; find android/app/src/main/java -name '*.java'; exit 1; }
+          cp android-extra/MainActivity.java android-extra/SecretActivity.java android-extra/AppProcess.java "$JAVA_DIR/"
+          npx cap sync android
+          mkdir -p android/app/src/main/assets/public
+          cp android-extra/secret.html android/app/src/main/assets/public/secret.html
+          # languages/*.json become built-in languages of the Android app (window.MWT_NATIVE_LANGS)
+          python3 tools/build_android_langs.py android/app/src/main/assets/public
+          # Register the hidden, exported activity without adding a launcher icon.
+          python3 - <<'PYMANIFEST'
+          from pathlib import Path
+          p = Path("android/app/src/main/AndroidManifest.xml")
+          s = p.read_text()
+          # own (empty) task affinity: SecretActivity never shares a task with the game, so Exit cannot reveal it
+          entry = '        <activity android:name=".SecretActivity" android:exported="true" android:label="Secret" android:taskAffinity="" />\n'
+          if ".SecretActivity" not in s:
+              s = s.replace("    </application>", entry + "    </application>")
+          p.write_text(s)
+          PYMANIFEST
+          for f in index.html dictionary.js about.js ads.js sounds.js; do
+            test -s "android/app/src/main/assets/public/$f" || { echo "missing in the app assets: $f"; exit 1; }
+          done
+          (cd android && chmod +x gradlew && ./gradlew assembleDebug)
+          mkdir out
+          cp android/app/build/outputs/apk/debug/app-debug.apk "out/MonoWordTest-${VER}-android.apk"
+      - uses: actions/upload-artifact@v7
+        with: { retention-days: 3, name: MonoWordTest-android, path: out/*.apk }

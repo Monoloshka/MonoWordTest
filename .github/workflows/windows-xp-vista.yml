@@ -1,0 +1,54 @@
+name: Build Windows XP/Vista (NW.js zip)
+
+# Own button: Actions tab -> "Build Windows XP/Vista (NW.js zip)" -> Run workflow.
+# The same file is also used by "Build packages" (all formats at once, tags -> GitHub Release).
+on:
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: '22'
+
+jobs:
+  win-xp:
+    name: Windows XP/Vista zip (NW.js 0.14.7, experimental)
+    runs-on: ubuntu-24.04
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/generate
+      - name: Assemble NW.js bundle
+        run: |
+          set -e
+          VER=$(node -p "require('./package.json').version")
+          NW=nwjs-v0.14.7-win-ia32
+          curl -fsSL -o nw.zip "https://dl.nwjs.io/v0.14.7/${NW}.zip"
+          unzip -q nw.zip
+          mkdir -p "$NW/package.nw"
+          sh tools/stage_web.sh "$NW/package.nw"
+          cp desktop/nw-bridge.js "$NW/package.nw/"
+          cp build/icon.png "$NW/package.nw/icon.png"
+          cat > "$NW/package.nw/package.json" <<'EOF'
+          {"name":"monowordtest","main":"index.html","inject-js-start":"nw-bridge.js","window":{"title":"MonoWordTest","width":960,"height":680,"min_width":360,"min_height":480,"icon":"icon.png"}}
+          EOF
+          # nw.exe carries NW.js's own icon (a hexagon with an arrow): replace it with the app icon.
+          # If this fails (e.g. wine cannot be installed) the zip is still built, just with the NW.js icon.
+          (
+            set -e
+            sudo apt-get update -qq && sudo apt-get install -y -qq wine64
+            cp build/icon.ico app.ico        # 16, 32, 48 and 256 px (tools/make_ico.py)
+            # rcedit calls a command named "wine64"; Ubuntu only installs "wine"
+            command -v wine64 >/dev/null || sudo ln -sf "$(command -v wine || echo /usr/lib/wine/wine64)" /usr/local/bin/wine64
+            export WINEPREFIX="$RUNNER_TEMP/wineprefix" WINEARCH=win64
+            npm install --no-audit --no-fund --no-save rcedit@5
+            WINEDEBUG=-all node -e "require('rcedit').rcedit('$NW/nw.exe',{icon:'app.ico'}).then(()=>console.log('icon replaced'),e=>{console.error(e);process.exit(1)})"
+          ) || echo "::warning::could not replace the NW.js icon in MonoWordTest.exe"
+          mv "$NW/nw.exe" "$NW/MonoWordTest.exe"
+          mv "$NW" MonoWordTest-winxp-vista
+          mkdir out
+          zip -qr "out/MonoWordTest-${VER}-winxp-vista-ia32.zip" MonoWordTest-winxp-vista
+      - uses: actions/upload-artifact@v7
+        with: { retention-days: 3, name: MonoWordTest-winxp-vista, path: out/*.zip }

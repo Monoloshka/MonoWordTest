@@ -1,0 +1,37 @@
+name: Build Web (zip, html)
+
+# Own button: Actions tab -> "Build Web (zip, html)" -> Run workflow.
+# The same file is also used by "Build packages" (all formats at once, tags -> GitHub Release).
+on:
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: '22'
+
+jobs:
+  web:
+    name: Web zip (any browser, ReactOS, Win 9x/2000 with an old browser)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/generate
+      - name: Zip
+        run: |
+          VER=$(node -p "require('./package.json').version")
+          sh tools/stage_web.sh stage
+          cp dictionary.txt claude.svg README.md stage/
+          cp -r languages stage/languages
+          mkdir out && (cd stage && zip -qr "../out/MonoWordTest-${VER}-web.zip" .)
+          zip -qr "out/MonoWordTest-${VER}-languages.zip" languages
+          cp MonoWordTest.html "out/MonoWordTest-${VER}.html"
+      - uses: actions/upload-artifact@v7
+        with:
+          retention-days: 3
+          name: MonoWordTest-web
+          path: |
+            out/*.zip
+            out/*.html
