@@ -281,7 +281,8 @@ In a normal web browser the browser's own zoom is used.
 
 ## Windows icon
 
-`build/icon.ico` holds exactly 16, 32, 48 and 256 px (16-48 as classic BMP entries, so Windows XP can read them; 256 as PNG).
+`build/icon.ico` holds exactly 16, 32, 48 and 256 px, all as classic 32-bit BMP entries (about 280 KB). That is readable by Windows XP and newer,
+by GIMP and by gdk-pixbuf (Xviewer, Eye of GNOME); gdk-pixbuf shows garbage for an icon that contains a PNG entry, so PNG is not used.
 Regenerate it from `build/icon.png` with `python3 tools/make_ico.py` (needs Pillow). electron-builder uses it for the Windows `.exe`,
 the CI puts the same file into the NW.js `nw.exe` (Windows XP/Vista build) with rcedit.
 
@@ -311,3 +312,23 @@ is not attached to GitHub Releases automatically: download it from the artifacts
 
 The Linux launcher (`tools/after-pack.js`) starts the app with `--log-level=3`, so Chromium's harmless warnings (VA-API, histograms)
 are not printed. Run with `MWT_VERBOSE=1 monowordtest` to see everything again.
+
+## Workflows (GitHub Actions)
+
+Every format has its own workflow with its own **Run workflow** button, so one slow or failing format (for example busy macOS runners)
+can be run again alone:
+
+| file | builds |
+|------|--------|
+| `web.yml` | web zip, languages zip, single `MonoWordTest.html` |
+| `windows-10-11.yml`, `windows-7-8.yml`, `windows-msi.yml`, `windows-xp-vista.yml` | Windows packages |
+| `macos.yml` | `.app` zip, `.dmg`, `.pkg` |
+| `linux.yml`, `linux-snap.yml`, `flatpak.yml` | Linux packages |
+| `openwrt.yml` | `.ipk` and `.apk` |
+| `android.yml`, `ios.yml` | Android `.apk`, unsigned iOS `.ipa` |
+| `build.yml` ("Build packages") | all of the above except Flatpak and iOS at once; a tag `v*` also attaches everything to a GitHub Release |
+
+`.github/actions/generate` is the shared first step: it regenerates `dictionary.js`, `ads.js`, `about.js`, `sounds.js`, `MonoWordTest.html` and the gettext files.
+
+Android: Capacitor's own splash picture and launcher logo are removed from the APK (the splash is a plain background in the app's colour).
+The `ic_call_*.png` pictures come from the AndroidX library and are not used by the app; removing them needs R8 resource shrinking, which is not enabled.

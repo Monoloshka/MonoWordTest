@@ -10,6 +10,7 @@ function parseArgs(argv) {
     const a=String(argv[i]);
     if(rest){opts.open.push(a);continue;}
     if(a==='--'){rest=true;continue;}
+    if(/^%[uUfFdDnNickvm]$/.test(a))continue;   // unexpanded .desktop placeholder (e.g. when a menu launcher command is typed into a terminal)
     if(a.length>1&&a[0]==='-'){
       const eq=a.indexOf('='), name=(a.startsWith('--')&&eq>0)?a.slice(0,eq):a;
       const inline=(a.startsWith('--')&&eq>0)?a.slice(eq+1):null;

@@ -4,10 +4,11 @@
 
   python3 tools/make_ico.py [input.png] [output.ico]
 
-16/32/48 are stored as classic 32-bit BMP entries (readable by Windows XP and every newer Windows);
-256 is stored as PNG (the Vista+ way, keeps the file small). Needs Pillow:  pip install pillow
+All four sizes are stored as classic 32-bit BMP entries. That is readable by Windows XP and every newer Windows, by GIMP,
+and also by gdk-pixbuf (Xviewer, Eye of GNOME, file managers), which shows garbage for icons that contain a PNG entry.
+The price is a larger file (about 280 KB). Needs Pillow:  pip install pillow
 """
-import io, os, struct, sys
+import os, struct, sys
 from PIL import Image
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -29,16 +30,13 @@ def bmp_entry(img):
     xor = b''.join(rows)
     and_row = ((w + 31) // 32) * 4                              # 1-bit AND mask, all zero (alpha channel does the work)
     mask = b'\x00' * (and_row * h)
-    header = struct.pack('<IiiHHIIiiII', 40, w, h * 2, 1, 32, 0, len(xor) + len(mask), 0, 0, 0, 0)
+    header = struct.pack('<IiiHHIIiiII', 40, w, h * 2, 1, 32, 0, len(xor), 0, 0, 0, 0)   # biSizeImage = pixels only (gdk-pixbuf/Xviewer need this)
     return header + xor + mask
 
 entries = []
 for n in SIZES:
     img = square.resize((n, n), Image.LANCZOS)
-    if n >= 256:
-        buf = io.BytesIO(); img.save(buf, 'PNG', optimize=True); data = buf.getvalue()
-    else:
-        data = bmp_entry(img)
+    data = bmp_entry(img)
     entries.append((n, data))
 
 out = struct.pack('<HHH', 0, 1, len(entries))
