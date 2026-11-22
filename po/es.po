@@ -87,14 +87,14 @@ msgstr "Publicidad"
 msgid "Folder…"
 msgstr "Carpeta…"
 
-msgid "Select several files at once: dictionaries (.txt, .xlsx, .xls, .ods) and the pictures they refer to."
-msgstr "Puedes seleccionar varios archivos a la vez: diccionarios (.txt, .xlsx, .xls, .ods) y las imágenes a las que hacen referencia."
+msgid "Select several files at once: dictionaries (.csv, .txt, .xlsx, .xls, .ods) and the pictures they refer to."
+msgstr "Puedes seleccionar varios archivos a la vez: diccionarios (.csv, .txt, .xlsx, .xls, .ods) y las imágenes a las que hacen referencia."
 
 msgid "Files selected: {n}"
 msgstr "Archivos seleccionados: {n}"
 
-msgid "No dictionary file (.txt, .xlsx, .xls, .ods) among the selected files."
-msgstr "No hay ningún diccionario (.txt, .xlsx, .xls, .ods) entre los archivos seleccionados."
+msgid "No dictionary file (.csv, .txt, .xlsx, .xls, .ods) among the selected files."
+msgstr "No hay ningún diccionario (.csv, .txt, .xlsx, .xls, .ods) entre los archivos seleccionados."
 
 msgid "Next question:"
 msgstr "Siguiente pregunta:"
@@ -210,5 +210,5 @@ msgstr "No hay suficientes respuestas únicas: {n} de {wanted}. Añade entradas 
 msgid "Oh, you found the secret page!"
 msgstr "¡Oh, has encontrado la página secreta!"
 
-msgid "Made with the help of Claude"
+msgid "Made with the help of Claude (claude.ai)"
 msgstr ""

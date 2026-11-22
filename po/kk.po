@@ -87,14 +87,14 @@ msgstr "Жарнама"
 msgid "Folder…"
 msgstr "Қалта…"
 
-msgid "Select several files at once: dictionaries (.txt, .xlsx, .xls, .ods) and the pictures they refer to."
-msgstr "Бірнеше файлды бірден таңдауға болады: сөздіктер (.txt, .xlsx, .xls, .ods) және олар сілтеме жасайтын суреттер."
+msgid "Select several files at once: dictionaries (.csv, .txt, .xlsx, .xls, .ods) and the pictures they refer to."
+msgstr "Бірнеше файлды бірден таңдауға болады: сөздіктер (.csv, .txt, .xlsx, .xls, .ods) және олар сілтеме жасайтын суреттер."
 
 msgid "Files selected: {n}"
 msgstr "Таңдалған файлдар: {n}"
 
-msgid "No dictionary file (.txt, .xlsx, .xls, .ods) among the selected files."
-msgstr "Таңдалған файлдардың ішінде сөздік жоқ (.txt, .xlsx, .xls, .ods)."
+msgid "No dictionary file (.csv, .txt, .xlsx, .xls, .ods) among the selected files."
+msgstr "Таңдалған файлдардың ішінде сөздік жоқ (.csv, .txt, .xlsx, .xls, .ods)."
 
 msgid "Next question:"
 msgstr "Келесі сұрақ:"
@@ -210,5 +210,5 @@ msgstr "Бірегей жауаптар жеткіліксіз: {n}/{wanted}. С
 msgid "Oh, you found the secret page!"
 msgstr "О, сіз құпия бетті таптыңыз!"
 
-msgid "Made with the help of Claude"
+msgid "Made with the help of Claude (claude.ai)"
 msgstr ""

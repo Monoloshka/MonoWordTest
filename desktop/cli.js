@@ -36,7 +36,7 @@ Usage: monowordtest [OPTIONS] [FILE|FOLDER|URL]...
 Options:
   -h, --help            show this help and exit
   -V, --version         show the version and exit
-      --open PATH|URL   import a dictionary (.txt .xlsx .xls .ods), related pictures, or a folder;
+      --open PATH|URL   import a dictionary (.csv .txt .xlsx .xls .ods), related pictures, or a folder;
                         http(s) URLs are downloaded. Repeatable; plain file/folder/URL arguments also work.
       --lang CODE|FILE  select an available language (ru, de, ja ...) or load a language .json for this run
       --log FILE        append diagnostic logs to FILE; also show logs in the terminal

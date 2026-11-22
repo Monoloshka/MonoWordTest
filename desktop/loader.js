@@ -1,7 +1,7 @@
 'use strict';
 const fs=require('fs'),path=require('path'),http=require('http'),https=require('https');
 const {URL}=require('url');
-const DICT=/\.(txt|xlsx|xls|ods)$/i,IMG=/\.(png|jpe?g|webp|gif|svg)$/i;
+const DICT=/\.(csv|txt|xlsx|xls|ods)$/i,IMG=/\.(png|jpe?g|webp|gif|svg)$/i;
 const LIMITS={file:50*1024*1024,total:300*1024*1024,count:5000,depth:8,timeout:20000};
 function fetchUrl(url,redirects){
  return new Promise((resolve,reject)=>{
@@ -27,10 +27,16 @@ async function loadTargets(targets,options){
   let data;try{data=fs.readFileSync(abs);}catch(e){problems.push(abs+': '+e.message+sandboxHint(abs));return true;}
   seen.add(abs);total+=data.length;files.push({name,rel,data});return true;
  }
- function addReferencedImages(dictAbs,folderName,dictDir,text){
+ function csvSides(line){   // first two cells of a CSV line (TAB, ; or , separated, optional quotes)
+  const m=line.includes('\t')?'\t':(line.includes(';')?';':',');
+  return line.split(m).slice(0,2).map(c=>c.trim().replace(/^"(.*)"$/,'$1').replace(/""/g,'"').trim());
+ }
+ function addReferencedImages(dictAbs,folderName,dictDir,text,csv){
   for(const line of text.replace(/^\uFEFF/,'').split(/\r\n|\r|\n/)){
-   const p=line.indexOf(' - ');if(p<0)continue;
-   for(const side of [line.slice(0,p).trim(),line.slice(p+3).trim()]){
+   let sides;
+   if(csv){sides=csvSides(line);}
+   else{const p=line.indexOf(' - ');if(p<0)continue;sides=[line.slice(0,p).trim(),line.slice(p+3).trim()];}
+   for(const side of sides){
     if(!IMG.test(side)||/^https?:\/\//i.test(side))continue;
     const target=path.resolve(dictDir,side),relPath=path.relative(dictDir,target);
     if(relPath.startsWith('..')||path.isAbsolute(relPath))continue;
@@ -51,7 +57,7 @@ async function loadTargets(targets,options){
  for(const target of targets){
   if(/^https?:\/\//i.test(target)){
    try{const u=new URL(target),name=decodeURIComponent(path.posix.basename(u.pathname))||'download';
-    if(!(DICT.test(name)||IMG.test(name))){problems.push(target+': URL must end in .txt, .xlsx, .xls, .ods or a picture extension');continue;}
+    if(!(DICT.test(name)||IMG.test(name))){problems.push(target+': URL must end in .csv, .txt, .xlsx, .xls, .ods or a picture extension');continue;}
     if(IMG.test(name)&&noimage)continue;const data=await fetchUrl(target,5);
     if(total+data.length>LIMITS.total){problems.push('total size limit reached');continue;}
     files.push({name,rel:name,data});total+=data.length;
@@ -61,10 +67,10 @@ async function loadTargets(targets,options){
   if(st.isDirectory()){walk(abs,path.basename(abs),0);continue;}
   if(!st.isFile()){problems.push(target+': not a file or folder');continue;}
   const base=path.basename(abs),dir=path.dirname(abs),folder=path.basename(dir)||'files';
-  if(!(DICT.test(base)||IMG.test(base))){problems.push(target+': not a dictionary (.txt .xlsx .xls .ods) or picture');continue;}
+  if(!(DICT.test(base)||IMG.test(base))){problems.push(target+': not a dictionary (.csv .txt .xlsx .xls .ods) or picture');continue;}
   if(IMG.test(base)&&noimage)continue;
   const before=files.length;if(!add(abs,folder+'/'+base,base))continue;
-  if(/\.txt$/i.test(base)&&!noimage&&files.length>before)addReferencedImages(abs,folder,dir,files[files.length-1].data.toString('utf8'));
+  if(/\.(txt|csv)$/i.test(base)&&!noimage&&files.length>before)addReferencedImages(abs,folder,dir,files[files.length-1].data.toString('utf8'),/\.csv$/i.test(base));
  }
  return {files,problems};
 }

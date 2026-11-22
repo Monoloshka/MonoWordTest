@@ -87,13 +87,13 @@ msgstr ""
 msgid "Folder…"
 msgstr ""
 
-msgid "Select several files at once: dictionaries (.txt, .xlsx, .xls, .ods) and the pictures they refer to."
+msgid "Select several files at once: dictionaries (.csv, .txt, .xlsx, .xls, .ods) and the pictures they refer to."
 msgstr ""
 
 msgid "Files selected: {n}"
 msgstr ""
 
-msgid "No dictionary file (.txt, .xlsx, .xls, .ods) among the selected files."
+msgid "No dictionary file (.csv, .txt, .xlsx, .xls, .ods) among the selected files."
 msgstr ""
 
 msgid "Next question:"
@@ -210,5 +210,5 @@ msgstr ""
 msgid "Oh, you found the secret page!"
 msgstr ""
 
-msgid "Made with the help of Claude"
+msgid "Made with the help of Claude (claude.ai)"
 msgstr ""

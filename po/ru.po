@@ -87,14 +87,14 @@ msgstr "Реклама"
 msgid "Folder…"
 msgstr "Папка…"
 
-msgid "Select several files at once: dictionaries (.txt, .xlsx, .xls, .ods) and the pictures they refer to."
-msgstr "Можно выбрать сразу несколько файлов: словари (.txt, .xlsx, .xls, .ods) и картинки, на которые они ссылаются."
+msgid "Select several files at once: dictionaries (.csv, .txt, .xlsx, .xls, .ods) and the pictures they refer to."
+msgstr "Можно выбрать сразу несколько файлов: словари (.csv, .txt, .xlsx, .xls, .ods) и картинки, на которые они ссылаются."
 
 msgid "Files selected: {n}"
 msgstr "Выбрано файлов: {n}"
 
-msgid "No dictionary file (.txt, .xlsx, .xls, .ods) among the selected files."
-msgstr "Среди выбранных файлов нет словаря (.txt, .xlsx, .xls, .ods)."
+msgid "No dictionary file (.csv, .txt, .xlsx, .xls, .ods) among the selected files."
+msgstr "Среди выбранных файлов нет словаря (.csv, .txt, .xlsx, .xls, .ods)."
 
 msgid "Next question:"
 msgstr "Следующий вопрос:"
@@ -210,5 +210,5 @@ msgstr "Недостаточно уникальных ответов: {n} из {
 msgid "Oh, you found the secret page!"
 msgstr "О, вы нашли секретную страницу!"
 
-msgid "Made with the help of Claude"
+msgid "Made with the help of Claude (claude.ai)"
 msgstr ""
