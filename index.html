@@ -146,12 +146,12 @@
 
     <div class="row">
       <label class="btn" for="file" data-i18n="Browse…">Browse&hellip;</label>
-      <input type="file" id="file" class="file-input" multiple accept=".txt,.xlsx,.xls,.ods,.png,.jpg,.jpeg,.webp,.gif,.svg,text/plain">
+      <input type="file" id="file" class="file-input" multiple accept=".csv,.txt,.xlsx,.xls,.ods,.png,.jpg,.jpeg,.webp,.gif,.svg,text/plain,text/csv">
       <label class="btn" for="folder" id="folderBtn" data-i18n="Folder…">Folder&hellip;</label>
       <input type="file" id="folder" class="file-input" multiple webkitdirectory>
       <button type="button" id="builtinBtn" data-i18n="Use built-in RU ↔ EN dictionary">Use built-in RU &#8596; EN dictionary</button>
     </div>
-    <div class="hint" data-i18n="Select several files at once: dictionaries (.txt, .xlsx, .xls, .ods) and the pictures they refer to.">Select several files at once: dictionaries (.txt, .xlsx, .xls, .ods) and the pictures they refer to.</div>
+    <div class="hint" data-i18n="Select several files at once: dictionaries (.csv, .txt, .xlsx, .xls, .ods) and the pictures they refer to.">Select several files at once: dictionaries (.csv, .txt, .xlsx, .xls, .ods) and the pictures they refer to.</div>
     <div class="row" id="fileName">No file selected</div>
 
     <div class="setting">
@@ -288,7 +288,7 @@
   var NOIMAGE = !!(CLI && CLI.noimage);
   if (CLI && CLI.nosound) { SOUNDS = {}; }
   var sessionLangs = [];
-  var DICT_EXT = { txt: 1, xlsx: 1, xls: 1, ods: 1 };
+  var DICT_EXT = { csv: 1, txt: 1, xlsx: 1, xls: 1, ods: 1 };
   var IMG_EXT = { png: 1, jpg: 1, jpeg: 1, webp: 1, gif: 1, svg: 1 };
 
   var pairs = [];
@@ -487,6 +487,7 @@
     setText($('message'), msgState.key ? t(msgState.key, msgState.params) : '');
     $('message').className = msgState.error ? 'error' : '';
   }
+  function clearWarning() { if (msgState.error) { setMessage(null, null, false); } }   // About / Back reset an old warning
   function setStatus(key, params) { statusState = { key: key, params: params || null }; renderStatus(); }
   function renderStatus() { setText($('status'), statusState.key ? t(statusState.key, statusState.params) : ''); }
 
@@ -557,6 +558,51 @@
         var p = line.indexOf(SEPARATOR);
         if (p < 0) { continue; }
         var pr = makePair(trim(line.substring(0, p)), trim(line.substring(p + SEPARATOR.length)), dir);
+        if (pr) { out.push(pr); }
+      }
+    } catch (e) { /* ignore: whatever was parsed so far is kept */ }
+    return out;
+  }
+  /* CSV: first column = first side, second column = second side. Delimiter (TAB, ; or ,) is detected from the first lines;
+     quoted cells ("a, b", "" for a quote, line breaks inside quotes) are supported. Like spreadsheets, every row counts. */
+  function csvDelimiter(text) {
+    var order = ['\t', ';', ','], score = { '\t': 0, ';': 0, ',': 0 }, seen = {}, inQ = false, lines = 0, i, c;
+    for (i = 0; i < text.length && lines < 20; i++) {
+      c = text.charAt(i);
+      if (c === '"') { inQ = !inQ; }
+      else if (!inQ) {
+        if (c === '\n') { lines++; seen = {}; }
+        else if (score.hasOwnProperty(c) && !seen[c]) { seen[c] = 1; score[c]++; }       // number of lines that contain it
+      }
+    }
+    var best = ',', n = -1;
+    for (i = 0; i < order.length; i++) { if (score[order[i]] > n) { best = order[i]; n = score[order[i]]; } }   // ties: TAB, then ;, then ,
+    return best;
+  }
+  function csvRows(text, d) {
+    var rows = [], row = [], cell = '', inQ = false, i, c;
+    for (i = 0; i < text.length && rows.length < MAX_PAIRS * 2; i++) {
+      c = text.charAt(i);
+      if (inQ) {
+        if (c === '"') { if (text.charAt(i + 1) === '"') { cell += '"'; i++; } else { inQ = false; } }
+        else { cell += c; }
+      } else if (c === '"' && cell === '') { inQ = true; }
+      else if (c === d) { row.push(cell); cell = ''; }
+      else if (c === '\n' || c === '\r') {
+        if (c === '\r' && text.charAt(i + 1) === '\n') { i++; }
+        row.push(cell); cell = ''; rows.push(row); row = [];
+      } else { cell += c; }
+    }
+    if (cell !== '' || row.length) { row.push(cell); rows.push(row); }
+    return rows;
+  }
+  function parseCsv(text, dir) {
+    var out = [];
+    try {
+      text = String(text).replace(/^\uFEFF/, '');
+      var rows = csvRows(text, csvDelimiter(text));
+      for (var i = 0; i < rows.length && out.length < MAX_PAIRS; i++) {
+        var pr = makePair(trim(rows[i][0] || ''), trim(rows[i][1] || ''), dir);
         if (pr) { out.push(pr); }
       }
     } catch (e) { /* ignore: whatever was parsed so far is kept */ }
@@ -669,7 +715,7 @@
       }
     }
     if (typeof FileReader === 'undefined') { finishLoading([], null, 'This browser cannot read files. Use the built-in dictionary.', 0); return; }
-    if (!dicts.length) { finishLoading([], null, 'No dictionary file (.txt, .xlsx, .xls, .ods) among the selected files.', 0); return; }
+    if (!dicts.length) { finishLoading([], null, 'No dictionary file (.csv, .txt, .xlsx, .xls, .ods) among the selected files.', 0); return; }
 
     var all = [], idx = 0, lastError = null;
     function next() {
@@ -681,6 +727,7 @@
         next();
       }
       if (d.ext === 'txt') { readTextFile(d.file, function (txt) { got(txt === null ? null : parseText(txt, dir), txt === null ? 'Could not read the file.' : null); }); }
+      else if (d.ext === 'csv') { readTextFile(d.file, function (txt) { got(txt === null ? null : parseCsv(txt, dir), txt === null ? 'Could not read the file.' : null); }); }
       else { readSpreadsheet(d.file, dir, got); }
     }
     next();
@@ -1014,8 +1061,8 @@
     }
   });
   on($('startBtn'), 'click', function () { if (pairs.length > 1) { playSound('start'); showGame(); } });
-  on($('aboutBtn'), 'click', function () { playSound('about'); showAbout(); });
-  on($('backBtn'), 'click', function () { playSound('back'); showMenu(); });
+  on($('aboutBtn'), 'click', function () { playSound('about'); clearWarning(); showAbout(); });
+  on($('backBtn'), 'click', function () { playSound('back'); clearWarning(); showMenu(); });
   on($('exitBtn'), 'click', exitApp);
   // iOS apps must not close themselves (the system does not allow it), so there is no Exit button on iPhone/iPad
   try { var C0 = window.Capacitor; if (C0 && C0.getPlatform && C0.getPlatform() === 'ios') { $('exitBtn').style.display = 'none'; } } catch (e) { }
@@ -1163,7 +1210,7 @@
       }
       console.info('--open: ' + files.length + ' file(s) received');
       if (files.length) { handleFiles(files); }
-      else { setMessage('No dictionary file (.txt, .xlsx, .xls, .ods) among the selected files.', null, true); }
+      else { setMessage('No dictionary file (.csv, .txt, .xlsx, .xls, .ods) among the selected files.', null, true); }
     }, function (err) { console.warn('--open failed: ' + err); });
   }
 

@@ -26,7 +26,7 @@ and finally `python3 tools/build_single.py`) and commit the regenerated `MonoWor
 ## Start screen options
 
 * **Dictionaries:** pick several files at once (**Browse...**) or a whole folder (**Folder...**, where the browser supports it).
-  Supported: `.txt` (`word - translation`), and spreadsheets `.xlsx`, `.xls`, `.ods` (Excel / LibreOffice Calc): column A and column B
+  Supported: `.txt` (`word - translation`), `.csv`, and spreadsheets `.xlsx`, `.xls`, `.ods` (Excel / LibreOffice Calc): column A and column B
   of every sheet. All chosen files are merged. The spreadsheet library (`vendor/`, SheetJS, Apache-2.0) is loaded only when a spreadsheet is chosen;
   it is not part of the OpenWrt package.
 * **Pictures instead of words:** a side of a line may be a picture reference (`.png .jpg .jpeg .webp .gif .svg`, or an `http(s)://` link), e.g.
@@ -332,3 +332,12 @@ can be run again alone:
 
 Android: Capacitor's own splash picture and launcher logo are removed from the APK (the splash is a plain background in the app's colour).
 The `ic_call_*.png` pictures come from the AndroidX library and are not used by the app; removing them needs R8 resource shrinking, which is not enabled.
+
+## CSV dictionaries
+
+`.csv` works like a spreadsheet: first column = one side, second column = the other side, every row is used (a header row would become a question,
+so leave it out). The delimiter (TAB, `;` or `,`) is detected automatically; `"quoted, cells"` and UTF-8 / Windows-1251 files are supported.
+
+## Warnings
+
+A red warning (for example "No dictionary file ... among the selected files.") is cleared when **About** or **Back** is pressed.
